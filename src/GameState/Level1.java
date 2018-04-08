@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import model.LevelTransition;
 import model.LinkedList;
 
 import java.io.*;
@@ -24,6 +25,9 @@ public class Level1 extends GameStateManager{
 
     private Label label;
     private Label subLabel;
+
+    private LevelTransition subScene;
+    private boolean firstRun = true;
 
     private Player player;
     private LinkedList<Bullet> bullets;
@@ -50,6 +54,8 @@ public class Level1 extends GameStateManager{
         MainEnemyList.add(new LinkedList<>());
 
         createBackground();
+        createSubScene();
+        createLabels();
 
         server = Server.getServer();
         server.setPlayer(player);
@@ -60,26 +66,6 @@ public class Level1 extends GameStateManager{
             }
         });
         thread.start();
-
-        try {
-            label = new Label();
-            label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
-            label.setTextFill(Color.valueOf("F8FFFD"));
-            label.setTranslateX(10);
-            label.setTranslateY(20);
-            Lvl1Pane.getChildren().add(label);
-
-            subLabel = new Label();
-            subLabel.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
-            subLabel.setTextFill(Color.valueOf("F8FFFD"));
-            subLabel.setTranslateX(10);
-            subLabel.setTranslateY(40);
-            Lvl1Pane.getChildren().add(subLabel);
-
-        } catch(FileNotFoundException e){
-            e.printStackTrace();
-        }
-
 
         int rng = (int) (Math.random() * 7);
 
@@ -129,6 +115,11 @@ public class Level1 extends GameStateManager{
             if (current == 4){
                 TheStage.setScene(Level2Scene);
                 GameState.index++;
+            }
+
+            if (firstRun){
+                subScene.startSubScene();
+                firstRun = false;
             }
 
             Lvl1Pane.getScene().setOnKeyPressed(e -> {
@@ -297,6 +288,32 @@ public class Level1 extends GameStateManager{
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, null);
 
         Lvl1Pane.setBackground(new Background(background));
+    }
+
+    private void createSubScene(){
+        subScene = new LevelTransition("Nivel 1");
+        Lvl1Pane.getChildren().add(subScene);
+    }
+
+    private void createLabels(){
+        try {
+            label = new Label();
+            label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            label.setTextFill(Color.valueOf("F8FFFD"));
+            label.setTranslateX(10);
+            label.setTranslateY(20);
+            Lvl1Pane.getChildren().add(label);
+
+            subLabel = new Label();
+            subLabel.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            subLabel.setTextFill(Color.valueOf("F8FFFD"));
+            subLabel.setTranslateX(10);
+            subLabel.setTranslateY(40);
+            Lvl1Pane.getChildren().add(subLabel);
+
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
     }
 
 }

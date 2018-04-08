@@ -17,6 +17,7 @@ public class Enemy
 {
     private Image[] images;
     private Image currentImage;
+    private int currentNum;
 
     private double x;
     private double y;
@@ -31,7 +32,6 @@ public class Enemy
     private boolean left;
 
     private double iR;
-
     private double iL;
     private String ID;
     private int life;
@@ -56,10 +56,14 @@ public class Enemy
         timeline.setCycleCount(Timeline.INDEFINITE);
 
         timeline.getKeyFrames().add(
-                new KeyFrame(Duration.millis(400),
+                new KeyFrame(Duration.millis(500),
                         e -> {
-                    final int nextIndex = rnd.nextInt(images.length);
-                    currentImage = images[nextIndex];
+                    if (currentNum == 0)
+                        currentNum = 1;
+                    else if (currentNum == 1)
+                        currentNum = 0;
+
+                    currentImage = images[currentNum];
                     }));
         timeline.playFromStart();
 
@@ -71,8 +75,6 @@ public class Enemy
         speed = 1.5;
 
     }
-
-
 
     public void update(){
 

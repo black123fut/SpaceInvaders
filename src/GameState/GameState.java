@@ -19,11 +19,6 @@ public class GameState
     private static final int HEIGHT = 720;
     private static final int WIDTH = 540;
 
-    Level1 lvl1State;
-    Level2 Level2State;
-    Level3 Level3State;
-
-
     private Canvas canvas1;
     private Canvas canvas2;
     private Canvas canvas3;
@@ -57,16 +52,16 @@ public class GameState
 
         //Niveles
         MenuState menuState = new MenuState(menuPane, TheStage, lvl1Scene);
-        lvl1State = new Level1(lvl1Pane, TheStage, Level2Scene);
-        Level2State = new Level2(Level2Pane, TheStage, Level3Scene);
-        Level3State = new Level3(Level3Pane);
+        Level1 lvl1State = new Level1(lvl1Pane, TheStage, Level2Scene);
+        Level2 level2State = new Level2(Level2Pane, TheStage, Level3Scene);
+        Level3 level3State = new Level3(Level3Pane);
 
 
         currentState = new LinkedList<>();
         currentState.add(menuState);
         currentState.add(lvl1State);
-        currentState.add(Level2State);
-        currentState.add(Level3State);
+        currentState.add(level2State);
+        currentState.add(level3State);
 
 
         TheStage.setScene(menuScene);
