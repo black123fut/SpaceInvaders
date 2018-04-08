@@ -30,11 +30,12 @@ public class Enemy
 
     private boolean right = true;
     private boolean left;
-
     private double iR;
     private double iL;
+
     private String ID;
     private int life;
+    private int score;
 
     public Enemy(double x, double y, double iR, double iL, String[] aliens, String ID){
         setPosition(x, y, iR, iL);
@@ -48,13 +49,10 @@ public class Enemy
 
         width = images[0].getWidth();
         height = images[0].getHeight();
-
-        Random rnd = new Random(System.nanoTime());
+        this.score = 10;
 
         Timeline timeline = new Timeline();
-
         timeline.setCycleCount(Timeline.INDEFINITE);
-
         timeline.getKeyFrames().add(
                 new KeyFrame(Duration.millis(500),
                         e -> {
@@ -67,13 +65,12 @@ public class Enemy
                     }));
         timeline.playFromStart();
 
-
-
-        if (ID.equals("BOSS"))
+        if (ID.equals("BOSS")) {
+            this.score = Math.abs(50);
             life = 7;
+        }
 
         speed = 1.5;
-
     }
 
     public void update(){
@@ -157,6 +154,10 @@ public class Enemy
 
     public int getLife(){
         return life;
+    }
+
+    public int getScore(){
+        return this.score;
     }
 
     public void setImages(String[] aliens){

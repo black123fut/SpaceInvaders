@@ -50,6 +50,9 @@ public class CircularList<T> implements ListModel<T>{
 
                 tmp.setNext(this.head.getNext());
                 size--;
+                if (size == -1)
+                    size = 0;
+
             } else {
                 cont++;
 
@@ -57,6 +60,8 @@ public class CircularList<T> implements ListModel<T>{
                     if (cont == index){
                         tmp.setNext(tmp.getNext().getNext());
                         size--;
+                        if (size == -1)
+                            size = 0;
                         return;
                     }
 

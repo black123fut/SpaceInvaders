@@ -63,7 +63,6 @@ public class GameState
         currentState.add(level2State);
         currentState.add(level3State);
 
-
         TheStage.setScene(menuScene);
     }
 

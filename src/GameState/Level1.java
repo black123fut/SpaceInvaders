@@ -25,6 +25,7 @@ public class Level1 extends GameStateManager{
 
     private Label label;
     private Label subLabel;
+    private Label scoreLabel;
 
     private LevelTransition subScene;
     private boolean firstRun = true;
@@ -47,24 +48,33 @@ public class Level1 extends GameStateManager{
 
         MainEnemyList = new LinkedList<>();
 
-        MainEnemyList.add(new LinkedList<>());
-        MainEnemyList.add(new LinkedList<>());
-        MainEnemyList.add(new LinkedList<>());
-        MainEnemyList.add(new LinkedList<>());
-        MainEnemyList.add(new LinkedList<>());
-
         createBackground();
         createSubScene();
         createLabels();
         connectSever();
+        generateRows();
+    }
 
-        int rng = (int) (Math.random() * 7);
+    /**
+     * crea las hileras de aliens de manera aleatoria
+     */
+    private void generateRows(){
+        for (int i = 0; i < 5; i++) {
+            MainEnemyList.add(new LinkedList<>());
+        }
 
-        createAliens(MainEnemyList.get(0), 0.0);
-        createAliens(MainEnemyList.get(1), rng);
-        createAliens(MainEnemyList.get(2) ,0.0);
-        rng = (int) (Math.random() * 7);
-        createAliens(MainEnemyList.get(3), rng);
+        for (int i = 0; i < 4; i++) {
+            int rowType = (int) (Math.random() * 2);
+
+            if(rowType == 0)
+                createAliens(MainEnemyList.get(i), 0.0);
+
+            if (rowType == 1){
+                int rng = (int) (Math.random() * 7);
+                createAliens(MainEnemyList.get(i), rng);
+            }
+        }
+
         createAliens(MainEnemyList.get(4), -150.0);
     }
 
@@ -166,7 +176,7 @@ public class Level1 extends GameStateManager{
             }
 
             player.update();
-            currentRow();
+            showRow();
 
 
         } catch( NullPointerException e){
@@ -196,6 +206,7 @@ public class Level1 extends GameStateManager{
                             if (MainEnemyList.get(current).length() > 0)
                                 lastX = MainEnemyList.get(current).get(0).getX();
 
+                            GameState.score += MainEnemyList.get(current).get(k).getScore();
                             MainEnemyList.get(current).remove(k);
                             bullets.remove(j);
 
@@ -221,8 +232,10 @@ public class Level1 extends GameStateManager{
         for (int i = 0; i < EnemyList.length(); i++) {
             if (EnemyList.get(i).getLife() != 1)
                 EnemyList.get(i).setLife(EnemyList.get(i).getLife() - 1);
-            else
+            else {
+                GameState.score += EnemyList.get(i).getScore();
                 current++;
+            }
         }
     }
 
@@ -246,7 +259,7 @@ public class Level1 extends GameStateManager{
         }
     }
 
-    public void currentRow(){
+    public void showRow(){
         String hilera = "Actual: ";
         String next = "Siguiente: ";
 
@@ -267,6 +280,7 @@ public class Level1 extends GameStateManager{
 
         subLabel.setText(next);
         label.setText(hilera);
+        scoreLabel.setText("Score: " + GameState.score);
         }
 
 
@@ -285,6 +299,9 @@ public class Level1 extends GameStateManager{
         Lvl1Pane.getChildren().add(subScene);
     }
 
+    /**
+     * Genera los label del juego
+     */
     private void createLabels(){
         try {
             label = new Label();
@@ -300,6 +317,13 @@ public class Level1 extends GameStateManager{
             subLabel.setTranslateX(10);
             subLabel.setTranslateY(40);
             Lvl1Pane.getChildren().add(subLabel);
+
+            scoreLabel = new Label();
+            scoreLabel.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            scoreLabel.setTextFill(Color.valueOf("F8FFFD"));
+            scoreLabel.setTranslateX(10);
+            scoreLabel.setTranslateY(60);
+            Lvl1Pane.getChildren().add(scoreLabel);
 
         } catch(FileNotFoundException e){
             e.printStackTrace();

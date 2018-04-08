@@ -35,6 +35,9 @@ public class Level3 extends GameStateManager {
         bullets = new LinkedList<>();
 
         MainEnemyList = new LinkedList<>();
+
+        MainEnemyList.add(new CircularList<>());
+        MainEnemyList.add(new DoubleLinkedList<>());
         MainEnemyList.add(new CircularList<>());
         MainEnemyList.add(new DoubleCircularList<>());
 
@@ -43,15 +46,23 @@ public class Level3 extends GameStateManager {
         MainEnemyList.get(0).setType("ClaseD");
         createAliens(MainEnemyList.get(0));
 
-        MainEnemyList.get(1).setType("ClaseE");
+        MainEnemyList.get(1).setType("ClaseB");
         createAliens(MainEnemyList.get(1));
+        bossTransition(MainEnemyList.get(1));
+
+        MainEnemyList.get(2).setType("ClaseC");
+        createAliens(MainEnemyList.get(2));
+
+        MainEnemyList.get(3).setType("ClaseE");
+        createAliens(MainEnemyList.get(3));
 
         createBackground();
     }
 
-    private void createSubScene() {
-        subScene = new LevelTransition("Nivel 3");
-        Pane.getChildren().add(subScene);
+    private void generateRows(){
+        for (int i = 0; i < 6; i++) {
+            int rowType = (int) (Math.random());
+        }
     }
 
     @SuppressWarnings("Duplicates")
@@ -92,15 +103,15 @@ public class Level3 extends GameStateManager {
         }
 
         //Enemy update
-        if (current == 0){
-            if (current != MainEnemyList.length()) {
-                for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
-                    MainEnemyList.get(current).get(i).update();
-                }
+        if (current != MainEnemyList.length()) {
+            for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
+                MainEnemyList.get(current).get(i).update();
             }
         }
 
         collisionController(MainEnemyList.get(current));
+
+        System.out.println(MainEnemyList.get(current).length());
 
         if (MainEnemyList.get(current).length() == 0) {
             current++;
@@ -124,24 +135,24 @@ public class Level3 extends GameStateManager {
         }
     }
 
-    private void createAliens(ListModel<Enemy> EnemyList){
-        String[][] images = { {"resources/Alien1.png", "resources/Alien2.png"},
-                              {"resources/Alien1green.png", "resources/Alien2green.png"},
-                              {"resources/Alien1blue.png", "resources/Alien2blue.png"},
-                              {"resources/Alien1pink.png", "resources/Alien2pink.png"},
-                              {"resources/Alien1orange.png", "resources/Alien2orange.png"},
-                              {"resources/Alien1yellow.png", "resources/Alien2yellow.png"},
-                              {"resources/Alien1turquesa.png", "resources/Alien2turquesa.png"} };
+    private void createAliens(ListModel<Enemy> EnemyList) {
+        String[][] images = {{"resources/Alien1.png", "resources/Alien2.png"},
+                {"resources/Alien1green.png", "resources/Alien2green.png"},
+                {"resources/Alien1blue.png", "resources/Alien2blue.png"},
+                {"resources/Alien1pink.png", "resources/Alien2pink.png"},
+                {"resources/Alien1orange.png", "resources/Alien2orange.png"},
+                {"resources/Alien1yellow.png", "resources/Alien2yellow.png"},
+                {"resources/Alien1turquesa.png", "resources/Alien2turquesa.png"}};
 
         String[] bossImages = {"resources/AlienBoss1.png", "resources/AlienBoss2.png"};
 
         int boss = 0;
-        if (EnemyList.getType().equals("ClaseD"))
-             boss = (int) (Math.random() * (7));
+        if (!EnemyList.getType().equals("ClaseE"))
+            boss = (int) (Math.random() * (7));
 
         int xPos = 7;
 
-        if (EnemyList.getType().equals("ClaseE")){
+        if (EnemyList.getType().equals("ClaseE")) {
             for (int i = 0; i < 7; i++) {
                 int life = (int) (Math.random() * 5) + 1;
 
@@ -154,11 +165,8 @@ public class Level3 extends GameStateManager {
                 xPos--;
             }
         } else {
-
-
             for (int i = 0; i < 7; i++) {
                 int life = (int) (Math.random() * 6) + 1;
-
                 if (i == boss)
                     EnemyList.add(new Enemy(55 * i, 1, xPos, i, bossImages, "BOSS"));
                 else {
@@ -168,12 +176,57 @@ public class Level3 extends GameStateManager {
                 xPos--;
             }
         }
-        if (EnemyList.getType().equals("ClaseD")) {
+        if (EnemyList.getType().equals("ClaseD") || EnemyList.getType().equals("ClaseC") ||
+                EnemyList.getType().equals("ClaseB")) {
             if (EnemyList.length() != 1)
                 keepSorted(EnemyList);
         }
 
 
+    }
+
+    private void collisionController(ListModel<Enemy> EnemyList){
+        for (int i = 0; i < bullets.length(); i++) {
+            Bullet bullet = bullets.get(i);
+
+            for (int j = 0; j < EnemyList.length(); j++) {
+                if (bullet.isColliding(EnemyList.get(j))){
+                    if (EnemyList.get(j).getLife() != 1)
+                        EnemyList.get(j).setLife(EnemyList.get(j).getLife() - 1);
+                    else {
+                        if (EnemyList.getType().equals("ClaseD")){
+                            boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
+
+                            EnemyList.remove(j);
+
+                            if (isBoss) {
+                                String[] bossImages = {"resources/AlienBoss1.png",
+                                        "resources/AlienBoss2.png"};
+                                EnemyList.get(0).setID("BOSS");
+                                EnemyList.get(0).setImages(bossImages);
+                            }
+                        }
+                        if (EnemyList.getType().equals("ClaseC")){
+                            boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
+
+                            EnemyList.remove(j);
+                            if(isBoss)
+                                positionChanger(EnemyList, EnemyList.getType());
+                        }
+                        if (EnemyList.getType().equals("ClaseB") && EnemyList.get(j).getID().equals("BOSS")){
+                            current++;
+                        }
+                        else
+                            EnemyList.remove(j);
+                    }
+                    bullets.remove(i);
+
+                    keepSorted(EnemyList);
+//                    if (EnemyList.getType().equals("ClaseE"))
+//                        inMiddle(EnemyList);
+                }
+            }
+        }
     }
 
     private void rotate(ListModel<Enemy> EnemyList){
@@ -199,7 +252,7 @@ public class Level3 extends GameStateManager {
                         EnemyList.get(i).setXandY(
                                 EnemyList.get(bossNumber).getX() + (60 + 55 * i) * Math.cos(t),
                                 EnemyList.get(bossNumber).getY() + (60 + 55 * i) * Math.sin(t));
-                    }if (i > bossNumber) {
+                    } if (i > bossNumber) {
                         EnemyList.get(i).setXandY(
                                 EnemyList.get(bossNumber).getX() + (60 - (55 * (i - 1.75))) * Math.cos(t),
                                 EnemyList.get(bossNumber).getY() + (60 - (55 * (i - 1.75))) * Math.sin(t));
@@ -210,40 +263,6 @@ public class Level3 extends GameStateManager {
         ));
 
         timeline.playFromStart();
-    }
-
-
-    private void collisionController(ListModel<Enemy> EnemyList){
-        for (int i = 0; i < bullets.length(); i++) {
-            Bullet bullet = bullets.get(i);
-
-            for (int j = 0; j < EnemyList.length(); j++) {
-                if (bullet.isColliding(EnemyList.get(j))){
-                    if (EnemyList.get(j).getLife() != 1)
-                        EnemyList.get(j).setLife(EnemyList.get(j).getLife() - 1);
-                    else {
-                        if (EnemyList.getType().equals("ClaseD")){
-                            boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
-
-                            EnemyList.remove(j);
-
-                            if (isBoss) {
-                                String[] bossImages = {"resources/AlienBoss1.png",
-                                        "resources/AlienBoss2.png"};
-                                EnemyList.get(0).setID("BOSS");
-                                EnemyList.get(0).setImages(bossImages);
-                            }
-                        } else
-                            EnemyList.remove(j);
-                    }
-                    bullets.remove(i);
-                    if (EnemyList.getType().equals("ClaseD"))
-                        keepSorted(EnemyList);
-//                    if (EnemyList.getType().equals("ClaseE"))
-//                        inMiddle(EnemyList);
-                }
-            }
-        }
     }
 
     private void inMiddle(ListModel<Enemy> EnemyList){
@@ -300,7 +319,8 @@ public class Level3 extends GameStateManager {
         if (lastX >= 540 - 55 * EnemyList.length())
             lastX = (540 - 55 * EnemyList.length() - 1);
 
-        bubbleSort(EnemyList);
+        if (EnemyList.getType().equals("ClaseD"))
+            bubbleSort(EnemyList);
 
         int xPos = EnemyList.length();
         for (int i = 0; i < EnemyList.length(); i++) {
@@ -309,6 +329,17 @@ public class Level3 extends GameStateManager {
         }
     }
 
+    private void bossTransition(ListModel<Enemy> EnemyList){
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.getKeyFrames().add(
+                new KeyFrame(Duration.seconds(4),
+                        e -> {
+                            if (EnemyList.length() != 1)
+                                positionChanger(EnemyList, EnemyList.getType());
+                        }));
+        timeline.playFromStart();
+    }
 
     private void createBackground() {
         Image backgroundImage = new Image("resources/background_game.png", true);
@@ -329,5 +360,10 @@ public class Level3 extends GameStateManager {
         });
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private void createSubScene() {
+        subScene = new LevelTransition("Nivel 3");
+        Pane.getChildren().add(subScene);
     }
 }
