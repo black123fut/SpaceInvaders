@@ -1,5 +1,6 @@
 package GameState;
 
+import Server.Server;
 import character.Bullet;
 import character.Enemy;
 import character.Player;
@@ -11,22 +12,21 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import jdk.jshell.spi.ExecutionEnv;
-import model.CircularList;
-import model.DoubleCircularList;
-import model.LinkedList;
-import model.ListModel;
+import model.*;
 import javafx.util.Duration;
 
 public class Level3 extends GameStateManager {
     private AnchorPane Pane;
+    private LevelTransition subScene;
 
     private Player player;
     private LinkedList<Bullet> bullets;
 
     private LinkedList<ListModel<Enemy>> MainEnemyList;
 
+    private Server server;
     private int current;
+    private boolean firstRun = true;
 
     Level3(AnchorPane Pane){
         this.Pane = Pane;
@@ -38,6 +38,8 @@ public class Level3 extends GameStateManager {
         MainEnemyList.add(new CircularList<>());
         MainEnemyList.add(new DoubleCircularList<>());
 
+        createSubScene();
+
         MainEnemyList.get(0).setType("ClaseD");
         createAliens(MainEnemyList.get(0));
 
@@ -47,9 +49,19 @@ public class Level3 extends GameStateManager {
         createBackground();
     }
 
+    private void createSubScene() {
+        subScene = new LevelTransition("Nivel 3");
+        Pane.getChildren().add(subScene);
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     public void update() {
+        if (firstRun){
+            serverConnect();
+            subScene.startSubScene();
+            firstRun = false;
+        }
 
         //Player
         Pane.getScene().setOnKeyPressed(e -> {
@@ -304,5 +316,18 @@ public class Level3 extends GameStateManager {
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, null);
 
         Pane.setBackground(new Background(background));
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void serverConnect() {
+        server = Server.getServer();
+        server.setPlayer(player);
+        Thread thread = new Thread(new Runnable(){
+            public void run(){
+                server.run();
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 }

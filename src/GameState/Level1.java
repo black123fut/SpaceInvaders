@@ -56,16 +56,7 @@ public class Level1 extends GameStateManager{
         createBackground();
         createSubScene();
         createLabels();
-
-        server = Server.getServer();
-        server.setPlayer(player);
-
-        Thread thread = new Thread(new Runnable(){
-            public void run(){
-                server.run();
-            }
-        });
-        thread.start();
+        connectSever();
 
         int rng = (int) (Math.random() * 7);
 
@@ -76,7 +67,6 @@ public class Level1 extends GameStateManager{
         createAliens(MainEnemyList.get(3), rng);
         createAliens(MainEnemyList.get(4), -150.0);
     }
-
 
     private void createAliens(LinkedList<Enemy> enemyList, int bossNum){
         String[] images = {"resources/Alien1.png", "resources/Alien2.png"};
@@ -316,4 +306,17 @@ public class Level1 extends GameStateManager{
         }
     }
 
+    @SuppressWarnings("Duplicates")
+    private void connectSever() {
+        server = Server.getServer();
+        server.setPlayer(player);
+
+        Thread thread = new Thread(new Runnable(){
+            public void run(){
+                server.run();
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
+    }
 }

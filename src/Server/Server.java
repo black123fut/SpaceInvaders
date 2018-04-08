@@ -38,7 +38,7 @@ public class Server {
         try {
             serverSocket = new ServerSocket(8000);
 
-            while (true){
+            while (true) {
                 socket = serverSocket.accept();
                 dout = new DataOutputStream(socket.getOutputStream());
                 dout.writeUTF(GameState.getNivel());
@@ -51,18 +51,17 @@ public class Server {
                     player.setLeft(false);
                     player.setRight(true);
                 }
-                if (message.equals("Left")){
+                if (message.equals("Left")) {
                     player.setFire(false);
                     player.setLeft(true);
                 }
-                if (message.equals("  ")){
+                if (message.equals("  ")) {
                     player.setLeft(false);
                     player.setRight(false);
                 }
                 if (message.equals("Fire"))
                     player.setFire(true);
             }
-
         } catch (IOException e) {
             System.out.print("");
         }

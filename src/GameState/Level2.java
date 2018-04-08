@@ -16,10 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import model.CircularList;
-import model.DoubleLinkedList;
-import model.LinkedList;
-import model.ListModel;
+import model.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,6 +25,7 @@ public class Level2 extends GameStateManager{
     private AnchorPane Pane;
     private Stage TheStage;
     private Scene Level3Scene;
+    private LevelTransition subScene;
 
     private Server server;
     private Player player;
@@ -38,7 +36,7 @@ public class Level2 extends GameStateManager{
     private Label label;
     private Label subLabel;
     private int current;
-    private int ActivateSocket;
+    private boolean firstRun = true;
 
     public Level2(AnchorPane Pane, Stage TheStage, Scene Level3Scene){
         this.Pane = Pane;
@@ -49,24 +47,6 @@ public class Level2 extends GameStateManager{
         bullets = new LinkedList<>();
 
 
-        try {
-            label = new Label();
-            label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
-            label.setTranslateX(10);
-            label.setTranslateY(20);
-            label.setTextFill(Color.valueOf("FFFFFF"));
-            Pane.getChildren().add(label);
-
-            subLabel = new Label();
-            subLabel.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
-            subLabel.setTranslateX(10);
-            subLabel.setTranslateY(40);
-            subLabel.setTextFill(Color.valueOf("FFFFFF"));
-            Pane.getChildren().add(subLabel);
-
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        }
 
         MainEnemyList = new LinkedList<>();
         //SubListas
@@ -77,6 +57,8 @@ public class Level2 extends GameStateManager{
         MainEnemyList.add(new LinkedList<>());
 
         createBackground();
+        createLabels();
+        createSubScene();
 
         createAliens(MainEnemyList.get(0));
         MainEnemyList.get(0).setType("ClaseB");
@@ -138,6 +120,7 @@ public class Level2 extends GameStateManager{
             timeline.playFromStart();
     }
 
+    @SuppressWarnings("Duplicates")
     public void serverConnect(){
         server = Server.getServer();
         server.setPlayer(player);
@@ -148,6 +131,7 @@ public class Level2 extends GameStateManager{
                 server.run();
             }
         });
+        thread.setDaemon(true);
         thread.start();
     }
 
@@ -160,9 +144,10 @@ public class Level2 extends GameStateManager{
                 GameState.index++;
             }
 
-            if (ActivateSocket == 0){
+            if (firstRun){
                 serverConnect();
-                ActivateSocket++;
+                subScene.startSubScene();
+                firstRun = false;
             }
 
             //player
@@ -379,5 +364,31 @@ public class Level2 extends GameStateManager{
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, null);
 
         Pane.setBackground(new Background(background));
+    }
+
+    private void createLabels() {
+        try {
+            label = new Label();
+            label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            label.setTranslateX(10);
+            label.setTranslateY(20);
+            label.setTextFill(Color.valueOf("FFFFFF"));
+            Pane.getChildren().add(label);
+
+            subLabel = new Label();
+            subLabel.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            subLabel.setTranslateX(10);
+            subLabel.setTranslateY(40);
+            subLabel.setTextFill(Color.valueOf("FFFFFF"));
+            Pane.getChildren().add(subLabel);
+
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void createSubScene() {
+        subScene = new LevelTransition("Nivel 2");
+        Pane.getChildren().add(subScene);
     }
 }
