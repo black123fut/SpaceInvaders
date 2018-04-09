@@ -73,6 +73,7 @@ public class Enemy
         speed = 1.5;
     }
 
+    @SuppressWarnings("Duplicates")
     public void update(){
         if (55 * iL > x) {
             setRight(true);
@@ -92,7 +93,29 @@ public class Enemy
         }
 
         x += dx;
-}
+    }
+
+    @SuppressWarnings("Duplicates")
+    public void update(int iL, int iR){
+        if (55 * iL > x) {
+            setRight(true);
+            y += 40;
+        }
+        if (x > 540 -  55 * iR){
+            setLeft(true);
+            y += 40;
+        }
+
+        if (right){
+            dx = speed;
+        }
+
+        if (left){
+            dx = -speed;
+        }
+
+        x += dx;
+    }
 
     public void render(GraphicsContext g){
         g.drawImage(currentImage, x, y);

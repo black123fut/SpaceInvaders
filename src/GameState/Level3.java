@@ -191,32 +191,37 @@ public class Level3 extends GameStateManager {
                     if (EnemyList.get(j).getLife() != 1)
                         EnemyList.get(j).setLife(EnemyList.get(j).getLife() - 1);
                     else {
-                        if (EnemyList.getType().equals("ClaseD")){
+                        if (EnemyList.getType().equals("ClaseD") || EnemyList.getType().equals("ClaseE")){
                             boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
+                            int toReplace = 0;
 
                             EnemyList.remove(j);
 
+                            if(EnemyList.getType().equals("ClaseE"))
+                                toReplace = (EnemyList.length() - (EnemyList.length() + 1) / 2);
+                            System.out.println(toReplace);
                             if (isBoss) {
                                 String[] bossImages = {"resources/AlienBoss1.png",
                                         "resources/AlienBoss2.png"};
-                                EnemyList.get(0).setID("BOSS");
-                                EnemyList.get(0).setImages(bossImages);
+                                EnemyList.get(toReplace).setID("BOSS");
+                                EnemyList.get(toReplace).setImages(bossImages);
+                                System.out.println(EnemyList.get(toReplace).getID());
                             }
                         }
-                        if (EnemyList.getType().equals("ClaseC")){
+                        else if (EnemyList.getType().equals("ClaseC")){
                             boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
 
                             EnemyList.remove(j);
                             if(isBoss)
                                 positionChanger(EnemyList, EnemyList.getType());
                         }
-                        if (EnemyList.getType().equals("ClaseB") && EnemyList.get(j).getID().equals("BOSS")){
+                        else if (EnemyList.getType().equals("ClaseB") && EnemyList.get(j).getID().equals("BOSS")){
                             current++;
                         }
-
-
-                        else
+                        else{
                             EnemyList.remove(j);
+                        }
+
                     }
                     bullets.remove(i);
 
@@ -241,21 +246,23 @@ public class Level3 extends GameStateManager {
                 double t = (System.currentTimeMillis() - timeStart) / 1000.0;
                 double x, y, pos = 1.75;
 
-                int bossNumber = EnemyList.length() / 2, leftSide = 0, rightSide = 0;
+                int bossNumber = EnemyList.length() / 2, leftSide = 0, rightSide = 0, xPos = EnemyList.length();
                 Enemy.speed = 1;
 
                 for (int i = 0; i < EnemyList.length(); i++) {
-                    if (EnemyList.get(i).getID().equals("BOSS"))
+                    if (EnemyList.get(i).getID().equals("BOSS")){
                         bossNumber = i;
+                        break;
+                    }
+                    xPos--;
                 }
-                EnemyList.get(bossNumber).update();
+
+                EnemyList.get(bossNumber).update(bossNumber, xPos);
                 x = EnemyList.get(bossNumber).getX();
                 y = EnemyList.get(bossNumber).getY();
 
-
-
                 if (EnemyList.length() < 6)
-                    pos = 0.70;
+                    pos = 0.60;
                 if(EnemyList.length() < 4)
                     pos = 0;
                 if(EnemyList.length() < 3)
@@ -268,7 +275,8 @@ public class Level3 extends GameStateManager {
                                 y + (55 + 55 * i) * Math.sin(t));
                         leftSide++;
                     } if (i > bossNumber) {
-                        System.out.println(i);
+                        if (EnemyList.length() < 5 && leftSide == 2)
+                            pos = 0.25;
                         if (EnemyList.length() < 7 && leftSide == 2)
                             pos = 1.15;
 
@@ -328,15 +336,12 @@ public class Level3 extends GameStateManager {
         for (int i = 0; i < EnemyList.length(); i++) {
             if(EnemyList.get(i).getID().equals("BOSS")){
                 if (EnemyList.get(i).getX() < 55 * i){
-                    EnemyList.get(i).setXandY(55 * i, EnemyList.get(i).getY());
+                    EnemyList.get(i).setXandY(55 * i + 1, EnemyList.get(i).getY());
                 }
                 if (EnemyList.get(i).getX() > 540 - 55 * xPos){
-                    EnemyList.get(i).setXandY(540 - 55 * xPos, EnemyList.get(i).getY());
+                    EnemyList.get(i).setXandY((540 - 55 * xPos) - 1, EnemyList.get(i).getY());
                 }
-                EnemyList.get(i).setiR(xPos);
-                EnemyList.get(i).setiL(i);
             }
-            System.out.println(EnemyList.get(i).getID() + "   " + i);
             xPos--;
         }
     }
