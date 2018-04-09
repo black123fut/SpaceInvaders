@@ -10,7 +10,7 @@ import model.LinkedList;
 public class GameState
 {
     private Stage TheStage;
-    static int index;
+    static int index = 3;
     private static String nivel = " ";
     static int score;
 
@@ -63,7 +63,7 @@ public class GameState
         currentState.add(level2State);
         currentState.add(level3State);
 
-        TheStage.setScene(menuScene);
+        TheStage.setScene(Level3Scene);
     }
 
     public Stage getTheStage(){

@@ -18,13 +18,10 @@ public class Server {
     private static BufferedReader bufferedReader;
     private static DataOutputStream dout;
     private static String message;
+    private static String toSend = "";
     private Player player;
 
     private Server(){
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
     }
 
     public static Server getServer(){
@@ -34,6 +31,14 @@ public class Server {
         return server;
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public void setToSend(String info){
+        toSend = info;
+    }
+
     public void run() {
         try {
             serverSocket = new ServerSocket(8000);
@@ -41,7 +46,7 @@ public class Server {
             while (true) {
                 socket = serverSocket.accept();
                 dout = new DataOutputStream(socket.getOutputStream());
-                dout.writeUTF(GameState.getNivel());
+                dout.writeUTF(toSend);
 
                 reader = new InputStreamReader(socket.getInputStream());
                 bufferedReader = new BufferedReader(reader);
@@ -52,7 +57,7 @@ public class Server {
                     player.setRight(true);
                 }
                 if (message.equals("Left")) {
-                    player.setFire(false);
+                    player.setRight(false);
                     player.setLeft(true);
                 }
                 if (message.equals("  ")) {

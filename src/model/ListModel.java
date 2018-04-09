@@ -8,5 +8,5 @@ public interface ListModel<T> {
     int length();
     void setType(String type);
     String getType();
-    CircularNode<T> getNode(int index);
+    NodeModel<T> getNode(int index);
 }

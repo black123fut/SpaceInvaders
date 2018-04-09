@@ -90,6 +90,7 @@ public class CircularList<T> implements ListModel<T>{
         return null;
     }
 
+    @SuppressWarnings("Duplicates")
     public CircularNode<T> getNode(int index){
         int cont = 0;
 

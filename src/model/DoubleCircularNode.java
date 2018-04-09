@@ -1,6 +1,6 @@
 package model;
 
-public class DoubleCircularNode<T> {
+public class DoubleCircularNode<T> implements NodeModel<T> {
     private T data;
     private DoubleCircularNode<T> next;
     private DoubleCircularNode<T> prev;

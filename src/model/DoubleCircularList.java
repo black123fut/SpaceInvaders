@@ -102,7 +102,21 @@ public class DoubleCircularList<T> implements ListModel<T> {
     }
 
     @Override
-    public CircularNode<T> getNode(int index) {
+    @SuppressWarnings("Duplicates")
+    public DoubleCircularNode<T> getNode(int index) {
+        int counter = 0;
+
+        if (head != null){
+            DoubleCircularNode<T> tmp = head;
+
+            while (counter <= size){
+                if (counter == index){
+                    return tmp;
+                }
+                tmp = tmp.getNext();
+                counter++;
+            }
+        }
         return null;
     }
 }

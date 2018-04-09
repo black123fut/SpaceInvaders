@@ -36,15 +36,16 @@ public class Level3 extends GameStateManager {
 
         MainEnemyList = new LinkedList<>();
 
-        MainEnemyList.add(new CircularList<>());
+        MainEnemyList.add(new DoubleCircularList<>());
         MainEnemyList.add(new DoubleLinkedList<>());
         MainEnemyList.add(new CircularList<>());
-        MainEnemyList.add(new DoubleCircularList<>());
+        MainEnemyList.add(new CircularList<>());
+
 
         createSubScene();
 
-        MainEnemyList.get(0).setType("ClaseD");
-        createAliens(MainEnemyList.get(0));
+        MainEnemyList.get(3).setType("ClaseD");
+        createAliens(MainEnemyList.get(3));
 
         MainEnemyList.get(1).setType("ClaseB");
         createAliens(MainEnemyList.get(1));
@@ -53,8 +54,9 @@ public class Level3 extends GameStateManager {
         MainEnemyList.get(2).setType("ClaseC");
         createAliens(MainEnemyList.get(2));
 
-        MainEnemyList.get(3).setType("ClaseE");
-        createAliens(MainEnemyList.get(3));
+        MainEnemyList.get(0).setType("ClaseE");
+        createAliens(MainEnemyList.get(0));
+        rotate(MainEnemyList.get(0));
 
         createBackground();
     }
@@ -105,18 +107,16 @@ public class Level3 extends GameStateManager {
         //Enemy update
         if (current != MainEnemyList.length()) {
             for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
-                MainEnemyList.get(current).get(i).update();
+//                MainEnemyList.get(current).get(i).update();
             }
         }
 
         collisionController(MainEnemyList.get(current));
 
-        System.out.println(MainEnemyList.get(current).length());
-
         if (MainEnemyList.get(current).length() == 0) {
             current++;
-            if (MainEnemyList.get(current).getType().equals("ClaseE"))
-                rotate(MainEnemyList.get(current));
+//            if (MainEnemyList.get(current).getType().equals("ClaseE"))
+//                rotate(MainEnemyList.get(current));
         }
     }
 
@@ -176,13 +176,10 @@ public class Level3 extends GameStateManager {
                 xPos--;
             }
         }
-        if (EnemyList.getType().equals("ClaseD") || EnemyList.getType().equals("ClaseC") ||
-                EnemyList.getType().equals("ClaseB")) {
+        if (!EnemyList.getType().equals("ClaseE")) {
             if (EnemyList.length() != 1)
                 keepSorted(EnemyList);
         }
-
-
     }
 
     private void collisionController(ListModel<Enemy> EnemyList){
@@ -216,12 +213,15 @@ public class Level3 extends GameStateManager {
                         if (EnemyList.getType().equals("ClaseB") && EnemyList.get(j).getID().equals("BOSS")){
                             current++;
                         }
+
+
                         else
                             EnemyList.remove(j);
                     }
                     bullets.remove(i);
 
-                    keepSorted(EnemyList);
+                    if (!EnemyList.getType().equals("ClaseE"))
+                        keepSorted(EnemyList);
 //                    if (EnemyList.getType().equals("ClaseE"))
 //                        inMiddle(EnemyList);
                 }
@@ -239,75 +239,106 @@ public class Level3 extends GameStateManager {
             @Override
             public void handle(ActionEvent ae) {
                 double t = (System.currentTimeMillis() - timeStart) / 1000.0;
+                double x, y, pos = 1.75;
 
-                int bossNumber = 0;
+                int bossNumber = EnemyList.length() / 2, leftSide = 0, rightSide = 0;
+                Enemy.speed = 1;
 
                 for (int i = 0; i < EnemyList.length(); i++) {
                     if (EnemyList.get(i).getID().equals("BOSS"))
                         bossNumber = i;
                 }
+                EnemyList.get(bossNumber).update();
+                x = EnemyList.get(bossNumber).getX();
+                y = EnemyList.get(bossNumber).getY();
+
+
+
+                if (EnemyList.length() < 6)
+                    pos = 0.70;
+                if(EnemyList.length() < 4)
+                    pos = 0;
+                if(EnemyList.length() < 3)
+                    pos = -1;
 
                 for (int i = 0; i < EnemyList.length(); i++) {
                     if (i < bossNumber) {
                         EnemyList.get(i).setXandY(
-                                EnemyList.get(bossNumber).getX() + (60 + 55 * i) * Math.cos(t),
-                                EnemyList.get(bossNumber).getY() + (60 + 55 * i) * Math.sin(t));
+                                x + (55 + 55 * i) * Math.cos(t),
+                                y + (55 + 55 * i) * Math.sin(t));
+                        leftSide++;
                     } if (i > bossNumber) {
+                        System.out.println(i);
+                        if (EnemyList.length() < 7 && leftSide == 2)
+                            pos = 1.15;
+
                         EnemyList.get(i).setXandY(
-                                EnemyList.get(bossNumber).getX() + (60 - (55 * (i - 1.75))) * Math.cos(t),
-                                EnemyList.get(bossNumber).getY() + (60 - (55 * (i - 1.75))) * Math.sin(t));
+                                x + (55 - (55 * (i - pos))) * Math.cos(t),
+                                y + (55 - (55 * (i - pos))) * Math.sin(t));
+                        rightSide++;
                     }
+                }
+
+                if((leftSide == 1 && rightSide == 3) || (rightSide == 1 && leftSide == 3) ||
+                        (leftSide == 0 && rightSide == 2) || (rightSide == 0 && leftSide == 2)){
+                    inMiddle(EnemyList);
                 }
             }
         }
         ));
-
         timeline.playFromStart();
     }
 
     private void inMiddle(ListModel<Enemy> EnemyList){
-        double lastX;
-        int ind = (EnemyList.length() - (EnemyList.length() + 1) / 2);
-        System.out.println(EnemyList.length());
-        if (!EnemyList.get(ind).getID().equals("BOSS")){
-            int tmpBoss = 0, change = (EnemyList.length() - (EnemyList.length() + 1) / 2);
+        int tmpBoss = 0, change = (EnemyList.length() - (EnemyList.length() + 1) / 2);
 
-            for (int i = 0; i < EnemyList.length(); i++) {
-                if (EnemyList.get(i).getID().equals("BOSS"))
-                    tmpBoss = i;
-            }
-            System.out.println(tmpBoss + "  Indice Boss");
-            System.out.println(change + "   Indice Change");
-            lastX = EnemyList.get(change).getX();
-            System.out.println(lastX + "   LastX");
-
-            double Xchange = EnemyList.get(change).getX(),
-                    Ychange = EnemyList.get(change).getY(),
-                    iRchange = EnemyList.get(change).getiR(),
-                    iLchange = EnemyList.get(change).getiL();
-
-            double Xboss = EnemyList.get(tmpBoss).getX()
-                    , Yboss = EnemyList.get(tmpBoss).getY()
-                    , iRboss = EnemyList.get(tmpBoss).getiR()
-                    , iLboss = EnemyList.get(tmpBoss).getiL();
-
-
-
-            EnemyList.get(tmpBoss).setPosition(
-                    Xchange, Ychange,
-                    iRchange, iLchange
-            );
-
-            EnemyList.get(change).setPosition(
-                    Xboss, Yboss,
-                    iRboss, iLboss
-            );
-
-            for (int i = 0; i < EnemyList.length(); i++) {
-                System.out.println(EnemyList.get(i).getID() + "   " + i);
-            }
+        for (int i = 0; i < EnemyList.length(); i++) {
+            if (EnemyList.get(i).getID().equals("BOSS"))
+                tmpBoss = i;
         }
 
+        double Xchange = EnemyList.get(change).getX(),
+                Ychange = EnemyList.get(change).getY(),
+                iRchange = EnemyList.get(change).getiR(),
+                iLchange = EnemyList.get(change).getiL();
+
+        double Xboss = EnemyList.get(tmpBoss).getX()
+                , Yboss = EnemyList.get(tmpBoss).getY()
+                , iRboss = EnemyList.get(tmpBoss).getiR()
+                , iLboss = EnemyList.get(tmpBoss).getiL();
+
+        EnemyList.get(tmpBoss).setPosition(
+                Xchange, Ychange,
+                iRchange, iLchange
+        );
+
+        EnemyList.get(change).setPosition(
+                Xboss, Yboss,
+                iRboss, iLboss
+        );
+
+        NodeModel<Enemy> node1 = EnemyList.getNode(change);
+        NodeModel<Enemy> node2 = EnemyList.getNode(tmpBoss);
+        CircularNode<Enemy> tmp = new CircularNode<>(node1.getData());
+
+        node1.setData(node2.getData());
+        node2.setData(tmp.getData());
+
+        int xPos = EnemyList.length();
+        for (int i = 0; i < EnemyList.length(); i++) {
+            if(EnemyList.get(i).getID().equals("BOSS")){
+                if (EnemyList.get(i).getX() < 55 * i){
+                    EnemyList.get(i).setXandY(55 * i, EnemyList.get(i).getY());
+                }
+                if (EnemyList.get(i).getX() > 540 - 55 * xPos){
+                    EnemyList.get(i).setXandY(540 - 55 * xPos, EnemyList.get(i).getY());
+                }
+                EnemyList.get(i).setiR(xPos);
+                EnemyList.get(i).setiL(i);
+            }
+            System.out.println(EnemyList.get(i).getID() + "   " + i);
+            xPos--;
+        }
     }
 
     private void keepSorted(ListModel<Enemy> EnemyList){

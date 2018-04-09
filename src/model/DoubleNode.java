@@ -1,6 +1,6 @@
 package model;
 
-public class DoubleNode<T> {
+public class DoubleNode<T> implements NodeModel<T> {
     private T data;
     private DoubleNode<T> next;
     private DoubleNode<T> prev;
@@ -15,8 +15,13 @@ public class DoubleNode<T> {
         this.prev = prev;
     }
 
-    T getData(){
+    public T getData(){
         return this.data;
+    }
+
+    @Override
+    public void setData(T data) {
+        this.data = data;
     }
 
     DoubleNode<T> getNext(){

@@ -1,6 +1,6 @@
 package model;
 
-public class CircularNode<T> {
+public class CircularNode<T> implements NodeModel<T>{
     private T data;
     private CircularNode<T> next;
 

@@ -213,6 +213,8 @@ public class Level2 extends GameStateManager{
         label.setText(text1);
         subLabel.setText(text2);
         scoreLabel.setText("Score: " + GameState.score);
+
+        server.setToSend(GameState.getNivel() + ", "+ label.getText() + ", " + subLabel.getText() + ", " + scoreLabel.getText());
     }
 
     private void createBackground() {

@@ -74,7 +74,6 @@ public class Enemy
     }
 
     public void update(){
-
         if (55 * iL > x) {
             setRight(true);
             y += 40;
@@ -172,6 +171,14 @@ public class Enemy
     public void setXandY(double x, double y){
         this.x = x;
         this.y = y;
+    }
+
+    public void setiR(int iR){
+        this.iR = iR;
+    }
+
+    public void setiL(int iL){
+        this.iL = iL;
     }
 
     public double getiR() {

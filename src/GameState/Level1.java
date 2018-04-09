@@ -281,6 +281,7 @@ public class Level1 extends GameStateManager{
         subLabel.setText(next);
         label.setText(hilera);
         scoreLabel.setText("Score: " + GameState.score);
+        server.setToSend(GameState.getNivel() + ", "+ label.getText() + ", " + subLabel.getText() + ", " + scoreLabel.getText());
         }
 
 
