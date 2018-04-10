@@ -1,16 +1,20 @@
 package GameState;
 
+import character.Enemy;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 import model.LinkedList;
+
+import java.io.File;
 
 public class GameState
 {
     private Stage TheStage;
-    static int index = 3;
+    static int index;
     private static String nivel = " ";
     static int score;
 
@@ -22,6 +26,8 @@ public class GameState
     private Canvas canvas1;
     private Canvas canvas2;
     private Canvas canvas3;
+
+    private AudioClip theme;
 
     private GraphicsContext g;
 
@@ -39,7 +45,6 @@ public class GameState
         AnchorPane Level3Pane = new AnchorPane();
         Scene Level3Scene = new Scene(Level3Pane, WIDTH, HEIGHT);
 
-        //
         TheStage = new Stage();
 
         canvas1 = new Canvas(WIDTH, HEIGHT);
@@ -56,14 +61,13 @@ public class GameState
         Level2 level2State = new Level2(Level2Pane, TheStage, Level3Scene);
         Level3 level3State = new Level3(Level3Pane);
 
-
         currentState = new LinkedList<>();
         currentState.add(menuState);
         currentState.add(lvl1State);
         currentState.add(level2State);
         currentState.add(level3State);
 
-        TheStage.setScene(Level3Scene);
+        TheStage.setScene(menuScene);
     }
 
     public Stage getTheStage(){
@@ -73,7 +77,6 @@ public class GameState
     public void init(){
         if (index == 1)
             g = canvas1.getGraphicsContext2D();
-
         if (index == 2)
             g = canvas2.getGraphicsContext2D();
         if (index == 3)
@@ -84,17 +87,32 @@ public class GameState
         currentState.get(index).render(g);
     }
 
-    public static String getNivel(){
+    static String getNivel(){
         return nivel;
     }
 
     private void setNivel(int dato){
-        if (dato == 1)
-            nivel = "Nivel 1";
-        else if (dato == 2)
-            nivel = "Nivel 2";
-        else if (dato == 3)
-            nivel = "Nivel 3";
+        if(!nivel.equals("Nivel " + dato)){
+            if (dato == 0){
+                theme = new AudioClip(new File("src/resources/sound/menuTheme.mp3").toURI().toString());
+                nivel = "Nivel 0";
+            }
+            else if (dato == 1){
+                theme.stop();
+
+                theme = new AudioClip(new File("src/resources/sound/theme.mp3").toURI().toString());
+                nivel = "Nivel 1";
+            }
+            else if (dato == 2)
+                nivel = "Nivel 2";
+            else if (dato == 3)
+                nivel = "Nivel 3";
+
+            if (theme != null && (nivel.equals("Nivel 1") || nivel.equals("Nivel 0"))) {
+                theme.setCycleCount(AudioClip.INDEFINITE);
+                theme.play(0.3);
+            }
+        }
     }
 
 }

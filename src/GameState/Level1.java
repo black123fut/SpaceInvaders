@@ -38,21 +38,22 @@ public class Level1 extends GameStateManager{
 
     private LinkedList<LinkedList<Enemy>> MainEnemyList;
 
-    public Level1(AnchorPane Lvl1Pane, Stage TheStage, Scene Level2Scene) {
+    Level1(AnchorPane Lvl1Pane, Stage TheStage, Scene Level2Scene) {
         this.Lvl1Pane = Lvl1Pane;
         this.TheStage = TheStage;
         this.Level2Scene = Level2Scene;
 
         player = new Player(220, 655);
         bullets = new LinkedList<>();
+        server = Server.getServer();
 
         MainEnemyList = new LinkedList<>();
 
         createBackground();
         createSubScene();
         createLabels();
-        connectSever();
         generateRows();
+        connectSever();
     }
 
     /**
@@ -115,12 +116,14 @@ public class Level1 extends GameStateManager{
             if (current == 4){
                 TheStage.setScene(Level2Scene);
                 GameState.index++;
+                Enemy.speed = 2.5;
             }
 
             if (firstRun){
                 subScene.startSubScene();
                 firstRun = false;
             }
+
 
             Lvl1Pane.getScene().setOnKeyPressed(e -> {
                 if (e.getCode() == KeyCode.LEFT) {
@@ -129,8 +132,6 @@ public class Level1 extends GameStateManager{
                 if (e.getCode() == KeyCode.RIGHT) {
                     player.setRight(true);
                 }
-                if (e.getCode() == KeyCode.SPACE)
-                    bullets.add(new Bullet(player.getX(), player.getY(), new Image("resources/bullet.png"), 20));
             });
 
             Lvl1Pane.getScene().setOnKeyReleased(e -> {
@@ -140,7 +141,8 @@ public class Level1 extends GameStateManager{
                 if (e.getCode() == KeyCode.LEFT) {
                     player.setLeft(false);
                 }
-
+                if (e.getCode() == KeyCode.SPACE)
+                    bullets.add(new Bullet(player.getX(), player.getY(), new Image("resources/bullet.png"), 20));
             });
 
             if(player.getFire()) {
@@ -228,12 +230,13 @@ public class Level1 extends GameStateManager{
         }
     }
 
-    public void collisionClassA(LinkedList<Enemy> EnemyList){
+    private void collisionClassA(LinkedList<Enemy> EnemyList){
         for (int i = 0; i < EnemyList.length(); i++) {
             if (EnemyList.get(i).getLife() != 1)
                 EnemyList.get(i).setLife(EnemyList.get(i).getLife() - 1);
             else {
                 GameState.score += EnemyList.get(i).getScore();
+                Enemy.speed += 0.25;
                 current++;
             }
         }
@@ -259,18 +262,21 @@ public class Level1 extends GameStateManager{
         }
     }
 
-    public void showRow(){
+    private void showRow(){
         String hilera = "Actual: ";
         String next = "Siguiente: ";
 
-        if (MainEnemyList.get(current + 1).getType().equals(""))
-            next += "";
-
-        else if (MainEnemyList.get(current + 1).getType().equals("ClaseA"))
-            next += "Clase A";
-
-        else if (MainEnemyList.get(current + 1).getType().equals("Basic"))
-            next += "Basic";
+        switch (MainEnemyList.get(current + 1).getType()) {
+            case "":
+                next += "";
+                break;
+            case "ClaseA":
+                next += "Clase A";
+                break;
+            case "Basic":
+                next += "Basic";
+                break;
+        }
 
         if (MainEnemyList.get(current).getType().equals("ClaseA"))
             hilera += "Clase A";
@@ -333,14 +339,9 @@ public class Level1 extends GameStateManager{
 
     @SuppressWarnings("Duplicates")
     private void connectSever() {
-        server = Server.getServer();
         server.setPlayer(player);
 
-        Thread thread = new Thread(new Runnable(){
-            public void run(){
-                server.run();
-            }
-        });
+        Thread thread = new Thread(() -> server.run());
         thread.setDaemon(true);
         thread.start();
     }

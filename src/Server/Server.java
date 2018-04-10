@@ -12,6 +12,7 @@ import java.net.Socket;
 
 public class Server {
     private static Server server = null;
+    private boolean connected;
     private static Socket socket;
     private static ServerSocket serverSocket;
     private static InputStreamReader reader;
@@ -39,12 +40,18 @@ public class Server {
         toSend = info;
     }
 
+    public boolean getConnected(){
+        return connected;
+    }
+
     public void run() {
         try {
             serverSocket = new ServerSocket(8000);
 
             while (true) {
                 socket = serverSocket.accept();
+                if (!connected)
+                    connected = true;
                 dout = new DataOutputStream(socket.getOutputStream());
                 dout.writeUTF(toSend);
 

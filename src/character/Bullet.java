@@ -4,6 +4,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 import javafx.geometry.Rectangle2D;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
+import java.io.File;
+
 
 public class Bullet {
     private Image image;
@@ -23,6 +29,9 @@ public class Bullet {
         this.image = image;
         this.width = image.getWidth();
         this.height = image.getHeight();
+
+        AudioClip sound = new AudioClip(new File("src/resources/sound/laser.mp3").toURI().toString());
+        sound.play();
 
         dy = -speed;
     }
@@ -47,3 +56,23 @@ public class Bullet {
         return y;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

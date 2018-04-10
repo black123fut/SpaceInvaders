@@ -39,14 +39,16 @@ public class Level2 extends GameStateManager{
 
     private int current;
     private boolean firstRun = true;
+    private boolean SceneRun = true;
 
-    public Level2(AnchorPane Pane, Stage TheStage, Scene Level3Scene){
+    Level2(AnchorPane Pane, Stage TheStage, Scene Level3Scene){
         this.Pane = Pane;
         this.TheStage = TheStage;
         this.Level3Scene = Level3Scene;
 
         player = new Player(220, 655);
         bullets = new LinkedList<>();
+        server = Server.getServer();
 
         MainEnemyList = new LinkedList<>();
         createBackground();
@@ -63,12 +65,20 @@ public class Level2 extends GameStateManager{
             if (current == 6){
                 TheStage.setScene(Level3Scene);
                 GameState.index++;
+                Enemy.speed = 3.6;
             }
 
-            if (firstRun){
-                serverConnect();
+            if (SceneRun){
                 subScene.startSubScene();
-                firstRun = false;
+                SceneRun = false;
+            }
+
+
+            if (server.getConnected()){
+                if (firstRun){
+                    serverConnect();
+                    firstRun = false;
+                }
             }
             //player
             Pane.getScene().setOnKeyPressed(e -> {
@@ -201,6 +211,7 @@ public class Level2 extends GameStateManager{
     /**
      * Actualiza la informacion de los textos
      */
+    @SuppressWarnings("Duplicates")
     private void showRow() {
         String text1 = "Actual: " + MainEnemyList.get(current).getType();
         String text2 = "Siguiente: ";
@@ -300,15 +311,9 @@ public class Level2 extends GameStateManager{
 
     @SuppressWarnings("Duplicates")
     private void serverConnect(){
-        server = Server.getServer();
         server.setPlayer(player);
 
-        Thread thread = new Thread(new Runnable(){
-
-            public void run(){
-                server.run();
-            }
-        });
+        Thread thread = new Thread(() -> server.run());
         thread.setDaemon(true);
         thread.start();
     }
