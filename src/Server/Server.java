@@ -1,7 +1,9 @@
 package Server;
 
-import GameState.GameState;
+import character.Bullet;
 import character.Player;
+import javafx.scene.image.Image;
+import model.LinkedList;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,6 +23,7 @@ public class Server {
     private static String message;
     private static String toSend = "";
     private Player player;
+    private LinkedList<Bullet> bullets;
 
     private Server(){
     }
@@ -34,6 +37,10 @@ public class Server {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void setBullets(LinkedList<Bullet> bullets){
+        this.bullets = bullets;
     }
 
     public void setToSend(String info){
@@ -72,7 +79,7 @@ public class Server {
                     player.setRight(false);
                 }
                 if (message.equals("Fire"))
-                    player.setFire(true);
+                    bullets.add(new Bullet(player.getX(), player.getY()));
             }
         } catch (IOException e) {
             System.out.print("");

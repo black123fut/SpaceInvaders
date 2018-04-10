@@ -74,9 +74,6 @@ public class Level3 extends GameStateManager {
                 player.setRight(true);
             if (e.getCode() == KeyCode.LEFT)
                 player.setLeft(true);
-            if (e.getCode() == KeyCode.SPACE)
-                bullets.add(new Bullet(player.getX(), player.getY(),
-                        new Image("resources/bullet.png"), 20));
         });
 
         Pane.getScene().setOnKeyReleased(e ->{
@@ -84,6 +81,8 @@ public class Level3 extends GameStateManager {
                 player.setRight(false);
             if (e.getCode() == KeyCode.LEFT)
                 player.setLeft(false);
+            if (e.getCode() == KeyCode.SPACE)
+                bullets.add(new Bullet(player.getX(), player.getY()));
         });
 
         player.update();
@@ -384,6 +383,8 @@ public class Level3 extends GameStateManager {
     @SuppressWarnings("Duplicates")
     private void serverConnect() {
         server.setPlayer(player);
+        server.setBullets(bullets);
+
         Thread thread = new Thread(() -> server.run());
         thread.setDaemon(true);
         thread.start();

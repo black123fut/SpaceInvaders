@@ -5,8 +5,6 @@ import javafx.scene.image.Image;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
 
@@ -22,18 +20,17 @@ public class Bullet {
     private double width;
     private double height;
 
-
-    public Bullet(double x, double y, Image image, double speed){
+    public Bullet(double x, double y){
         this.x  = x + 37;
         this.y = y - 20;
-        this.image = image;
+        this.image = new Image("resources/bullet.png");
         this.width = image.getWidth();
         this.height = image.getHeight();
 
-        AudioClip sound = new AudioClip(new File("src/resources/sound/laser.mp3").toURI().toString());
-        sound.play();
+        AudioClip laserSound = new AudioClip(new File("src/resources/sound/laser.mp3").toURI().toString());
+        laserSound.play();
 
-        dy = -speed;
+        dy = -20;
     }
 
     public void update(){

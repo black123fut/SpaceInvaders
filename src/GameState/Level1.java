@@ -124,7 +124,6 @@ public class Level1 extends GameStateManager{
                 firstRun = false;
             }
 
-
             Lvl1Pane.getScene().setOnKeyPressed(e -> {
                 if (e.getCode() == KeyCode.LEFT) {
                     player.setLeft(true);
@@ -142,13 +141,8 @@ public class Level1 extends GameStateManager{
                     player.setLeft(false);
                 }
                 if (e.getCode() == KeyCode.SPACE)
-                    bullets.add(new Bullet(player.getX(), player.getY(), new Image("resources/bullet.png"), 20));
+                    bullets.add(new Bullet(player.getX(), player.getY()));
             });
-
-            if(player.getFire()) {
-                bullets.add(new Bullet(player.getX(), player.getY(), new Image("resources/bullet.png"), 20));
-                player.setFire(false);
-            }
 
             //Player Bullets update
             for (int i = 0; i < bullets.length(); i++) {
@@ -159,7 +153,6 @@ public class Level1 extends GameStateManager{
                 }
                 shoot.update();
             }
-
             //collision
             collisionController();
 
@@ -340,6 +333,7 @@ public class Level1 extends GameStateManager{
     @SuppressWarnings("Duplicates")
     private void connectSever() {
         server.setPlayer(player);
+        server.setBullets(bullets);
 
         Thread thread = new Thread(() -> server.run());
         thread.setDaemon(true);
