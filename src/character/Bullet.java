@@ -53,23 +53,3 @@ public class Bullet {
         return y;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

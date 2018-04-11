@@ -241,7 +241,6 @@ public class Level1 extends GameStateManager{
 
             player.render(g);
 
-
             for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
                 MainEnemyList.get(current).get(i).render(g);
             }

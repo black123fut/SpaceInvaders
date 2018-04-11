@@ -1,9 +1,9 @@
 package GameState;
 
-import character.Enemy;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
@@ -14,7 +14,7 @@ import java.io.File;
 public class GameState
 {
     private Stage TheStage;
-    static int index;
+    static int index = 4;
     private static String nivel = " ";
     static int score;
 
@@ -45,6 +45,9 @@ public class GameState
         AnchorPane Level3Pane = new AnchorPane();
         Scene Level3Scene = new Scene(Level3Pane, WIDTH, HEIGHT);
 
+        AnchorPane FinalPane = new AnchorPane();
+        Scene FinalScene = new Scene(FinalPane, WIDTH, HEIGHT);
+
         TheStage = new Stage();
 
         canvas1 = new Canvas(WIDTH, HEIGHT);
@@ -60,14 +63,16 @@ public class GameState
         Level1 lvl1State = new Level1(lvl1Pane, TheStage, Level2Scene);
         Level2 level2State = new Level2(Level2Pane, TheStage, Level3Scene);
         Level3 level3State = new Level3(Level3Pane);
+        FinalState finalState = new FinalState(FinalPane, TheStage, menuScene);
 
         currentState = new LinkedList<>();
         currentState.add(menuState);
         currentState.add(lvl1State);
         currentState.add(level2State);
         currentState.add(level3State);
+        currentState.add(finalState);
 
-        TheStage.setScene(menuScene);
+        TheStage.setScene(FinalScene);
     }
 
     public Stage getTheStage(){
@@ -81,7 +86,6 @@ public class GameState
             g = canvas2.getGraphicsContext2D();
         if (index == 3)
             g = canvas3.getGraphicsContext2D();
-
         setNivel(index);
         currentState.get(index).update();
         currentState.get(index).render(g);
@@ -99,7 +103,6 @@ public class GameState
             }
             else if (dato == 1){
                 theme.stop();
-
                 theme = new AudioClip(new File("src/resources/sound/theme.mp3").toURI().toString());
                 nivel = "Nivel 1";
             }
@@ -114,5 +117,4 @@ public class GameState
             }
         }
     }
-
 }
