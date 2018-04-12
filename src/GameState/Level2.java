@@ -26,6 +26,7 @@ public class Level2 extends GameStateManager{
     private Stage TheStage;
     private Scene Level3Scene;
     private LevelTransition subScene;
+    private Scene FinalScene;
 
     private Server server;
     private Player player;
@@ -40,15 +41,18 @@ public class Level2 extends GameStateManager{
     private int current;
     private boolean firstRun = true;
     private boolean SceneRun = true;
+    private Label level;
 
-    Level2(AnchorPane Pane, Stage TheStage, Scene Level3Scene){
+    Level2(AnchorPane Pane, Stage TheStage, Scene Level3Scene, Scene FinalScene){
         this.Pane = Pane;
         this.TheStage = TheStage;
         this.Level3Scene = Level3Scene;
+        this.FinalScene = FinalScene;
 
         player = new Player(220, 655);
         bullets = new LinkedList<>();
         server = Server.getServer();
+        current = 0;
 
         MainEnemyList = new LinkedList<>();
         createBackground();
@@ -115,6 +119,12 @@ public class Level2 extends GameStateManager{
             if (current != MainEnemyList.length() - 1){
                 for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
                     MainEnemyList.get(current).get(i).update();
+
+                    if (MainEnemyList.get(current).get(i).getY() > 620){
+                        GameState.index = 4;
+                        FinalState.condition = "Has Perdido";
+                        TheStage.setScene(FinalScene);
+                    }
                 }
             }
 
@@ -214,6 +224,7 @@ public class Level2 extends GameStateManager{
         else
             text2 += MainEnemyList.get(current + 1).getType();
 
+        level.setText(GameState.getNivel());
         label.setText(text1);
         subLabel.setText(text2);
         scoreLabel.setText("Score: " + GameState.score);
@@ -231,6 +242,13 @@ public class Level2 extends GameStateManager{
 
     private void createLabels() {
         try {
+            level = new Label();
+            level.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            level.setTranslateX(10);
+            level.setTranslateY(0);
+            level.setTextFill(Color.valueOf("FFFFFF"));
+            Pane.getChildren().add(level);
+
             label = new Label();
             label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
             label.setTranslateX(10);

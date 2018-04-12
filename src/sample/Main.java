@@ -5,6 +5,8 @@ import GameState.Level1;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import GameState.MenuState;
@@ -24,8 +26,12 @@ public class Main extends Application
             theStage.getIcons().add(icon);
             theStage.setTitle("Space Invaders");
 
-            theStage.show();
+            theStage.addEventFilter(KeyEvent.KEY_PRESSED, k -> {
+                if ( k.getCode() == KeyCode.SPACE)
+                    k.consume();
+            });
 
+            theStage.show();
             new AnimationTimer(){
                 @Override
                 public void handle(long currentNanoTime){

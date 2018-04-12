@@ -22,7 +22,9 @@ public class Level1 extends GameStateManager{
     private AnchorPane Lvl1Pane;
     private Stage TheStage;
     private Scene Level2Scene;
+    private Scene FinalScene;
 
+    private Label level;
     private Label label;
     private Label subLabel;
     private Label scoreLabel;
@@ -38,14 +40,16 @@ public class Level1 extends GameStateManager{
 
     private LinkedList<LinkedList<Enemy>> MainEnemyList;
 
-    Level1(AnchorPane Lvl1Pane, Stage TheStage, Scene Level2Scene) {
+    Level1(AnchorPane Lvl1Pane, Stage TheStage, Scene Level2Scene ,Scene FinalScene) {
         this.Lvl1Pane = Lvl1Pane;
         this.TheStage = TheStage;
         this.Level2Scene = Level2Scene;
+        this.FinalScene = FinalScene;
 
         player = new Player(220, 655);
         bullets = new LinkedList<>();
         server = Server.getServer();
+        current = 0;
 
         MainEnemyList = new LinkedList<>();
 
@@ -158,10 +162,15 @@ public class Level1 extends GameStateManager{
 
             //Enemy update
             if (current != MainEnemyList.length() - 1){
-
-            for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
-                Enemy enemy = MainEnemyList.get(current).get(i);
-                enemy.update();}
+                for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
+                    Enemy enemy = MainEnemyList.get(current).get(i);
+                    enemy.update();
+                    if (enemy.getY() > 620){
+                        TheStage.setScene(FinalScene);
+                        FinalState.condition = "Has Perdido";
+                        GameState.index = 4;
+                    }
+                }
             }
 
             //Control de hileras
@@ -276,6 +285,7 @@ public class Level1 extends GameStateManager{
         else if (MainEnemyList.get(current).getType().equals("Basic"))
             hilera += "Basic";
 
+        level.setText(GameState.getNivel());
         subLabel.setText(next);
         label.setText(hilera);
         scoreLabel.setText("Score: " + GameState.score);
@@ -303,6 +313,13 @@ public class Level1 extends GameStateManager{
      */
     private void createLabels(){
         try {
+            level = new Label();
+            level.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            level.setTextFill(Color.valueOf("F8FFFD"));
+            level.setTranslateX(10);
+            level.setTranslateY(0);
+            Lvl1Pane.getChildren().add(level);
+
             label = new Label();
             label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
             label.setTextFill(Color.valueOf("F8FFFD"));

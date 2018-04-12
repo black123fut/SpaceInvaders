@@ -6,6 +6,7 @@ import character.Enemy;
 import character.Player;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -13,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import model.*;
 import javafx.util.Duration;
 
@@ -20,8 +22,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Level3 extends GameStateManager {
+    private Stage TheStage;
     private AnchorPane Pane;
     private LevelTransition subScene;
+    private Scene FinalScene;
 
     private Player player;
     private LinkedList<Bullet> bullets;
@@ -38,9 +42,12 @@ public class Level3 extends GameStateManager {
     private boolean firstRun = true;
     private boolean eRun = true;
     private boolean sceneRun = true;
+    private Label level;
 
-    Level3(AnchorPane Pane){
+    Level3(AnchorPane Pane, Stage TheStage, Scene FinalScene){
         this.Pane = Pane;
+        this.TheStage = TheStage;
+        this.FinalScene = FinalScene;
 
         player = new Player(220, 655);
         bullets = new LinkedList<>();
@@ -100,6 +107,12 @@ public class Level3 extends GameStateManager {
             if (!MainEnemyList.get(current).getType().equals("ClaseE")){
                 for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
                     MainEnemyList.get(current).get(i).update();
+
+                    if (MainEnemyList.get(current).get(i).getY() > 620){
+                        GameState.index = 4;
+                        FinalState.condition = "Has Perdido";
+                        TheStage.setScene(FinalScene);
+                    }
                 }
             } else{
                 if (eRun){
@@ -107,7 +120,12 @@ public class Level3 extends GameStateManager {
                     eRun = false;
                 }
             }
+        } else{
+            GameState.index = 4;
+            FinalState.condition = "       Victoria";
+            TheStage.setScene(FinalScene);
         }
+
         collisionController(MainEnemyList.get(current));
 
         if (MainEnemyList.get(current).length() == 0) {
@@ -213,8 +231,10 @@ public class Level3 extends GameStateManager {
                             boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
 
                             GameState.score += EnemyList.get(j).getScore();
-                            EnemyList.remove(j);
-                            if(isBoss)
+
+                            if (!isBoss || EnemyList.length() == 1)
+                                EnemyList.remove(j);
+                            else
                                 positionChanger(EnemyList, "ClaseC");
                         }
                         else if (EnemyList.getType().equals("ClaseB") && EnemyList.get(j).getID().equals("BOSS")){
@@ -243,50 +263,59 @@ public class Level3 extends GameStateManager {
         final long timeStart = System.currentTimeMillis();
 
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.017), ae -> {
-            double t = (System.currentTimeMillis() - timeStart) / 1000.0;
-            double x, y, pos = 1.75;
-            int bossNumber = EnemyList.length() / 2, leftSide = 0, rightSide = 0, xPos = EnemyList.length();
+            if (EnemyList == MainEnemyList.get(current)){
+                double t = (System.currentTimeMillis() - timeStart) / 1000.0;
+                double x, y, pos = 1.75;
+                int bossNumber = EnemyList.length() / 2, leftSide = 0, rightSide = 0, xPos = EnemyList.length();
 
-            for (int i = 0; i < EnemyList.length(); i++) {
-                if (EnemyList.get(i).getID().equals("BOSS")){
-                    bossNumber = i;
-                    break;
+                for (int i = 0; i < EnemyList.length(); i++) {
+                    if (EnemyList.get(i).getID().equals("BOSS")){
+                        bossNumber = i;
+                        break;
+                    }
+                    xPos--;
                 }
-                xPos--;
-            }
 
-            EnemyList.get(bossNumber).update(bossNumber, xPos);
-            x = EnemyList.get(bossNumber).getX();
-            y = EnemyList.get(bossNumber).getY();
+                EnemyList.get(bossNumber).update(bossNumber, xPos);
 
-            if (EnemyList.length() < 6)
-                pos = 0.60;
-            if(EnemyList.length() < 4)
-                pos = 0;
-            if(EnemyList.length() < 3)
-                pos = -1;
-
-            for (int i = 0; i < EnemyList.length(); i++) {
-                if (i < bossNumber) {
-                    EnemyList.get(i).setXandY(
-                            x + (55 + 55 * i) * Math.cos(t),
-                            y + (55 + 55 * i) * Math.sin(t));
-                    leftSide++;
-                } if (i > bossNumber) {
-                    if (EnemyList.length() < 5 && leftSide == 1)
-                        pos = 0;
-                    if (EnemyList.length() < 7 && leftSide == 2)
-                        pos = 1.15;
-
-                    EnemyList.get(i).setXandY(
-                            x + (55 - (55 * (i - pos))) * Math.cos(t),
-                            y + (55 - (55 * (i - pos))) * Math.sin(t));
-                    rightSide++;
+                if (EnemyList.get(bossNumber).getY() > 620){
+                    GameState.index = 4;
+                    FinalState.condition = "Has Perdido";
+                    TheStage.setScene(FinalScene);
                 }
-            }
-            if((leftSide == 1 && rightSide == 3) || (rightSide == 1 && leftSide == 3) ||
-                    (leftSide == 0 && rightSide == 2) || (rightSide == 0 && leftSide == 2)){
-                inMiddle(EnemyList);
+
+                x = EnemyList.get(bossNumber).getX();
+                y = EnemyList.get(bossNumber).getY();
+
+                if (EnemyList.length() < 6)
+                    pos = 0.60;
+                if(EnemyList.length() < 4)
+                    pos = 0;
+                if(EnemyList.length() < 3)
+                    pos = -1;
+
+                for (int i = 0; i < EnemyList.length(); i++) {
+                    if (i < bossNumber) {
+                        EnemyList.get(i).setXandY(
+                                x + (55 + 55 * i) * Math.cos(t),
+                                y + (55 + 55 * i) * Math.sin(t));
+                        leftSide++;
+                    } if (i > bossNumber) {
+                        if (EnemyList.length() < 5 && leftSide == 1)
+                            pos = 0;
+                        if (EnemyList.length() < 7 && leftSide == 2)
+                            pos = 1.15;
+
+                        EnemyList.get(i).setXandY(
+                                x + (55 - (55 * (i - pos))) * Math.cos(t),
+                                y + (55 - (55 * (i - pos))) * Math.sin(t));
+                        rightSide++;
+                    }
+                }
+                if((leftSide == 1 && rightSide == 3) || (rightSide == 1 && leftSide == 3) ||
+                        (leftSide == 0 && rightSide == 2) || (rightSide == 0 && leftSide == 2)){
+                    inMiddle(EnemyList);
+                }
             }
         }));
         timeline.playFromStart();
@@ -405,6 +434,7 @@ public class Level3 extends GameStateManager {
         else
             text2 += MainEnemyList.get(current + 1).getType();
 
+        level.setText(GameState.getNivel());
         label.setText(text1);
         subLabel.setText(text2);
         score.setText("Score: " + GameState.score);
@@ -414,6 +444,13 @@ public class Level3 extends GameStateManager {
 
     private void createLabels() {
         try {
+            level = new Label();
+            level.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
+            level.setTranslateX(10);
+            level.setTranslateY(0);
+            level.setTextFill(Color.valueOf("FFFFFF"));
+            Pane.getChildren().add(level);
+
             label = new Label();
             label.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 20));
             label.setTranslateX(10);

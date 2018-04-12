@@ -37,8 +37,13 @@ public class MenuState extends GameStateManager{
                 GameState.index++;
             }
         });
-
         MenuPane.getChildren().add(boton);
+
+        gameButton exit = new gameButton("Salir");
+        exit.setTranslateX(270 - 190 / 2);
+        exit.setTranslateY(350);
+        exit.setOnAction(e -> TheStage.close());
+        MenuPane.getChildren().add(exit);
     }
 
     private void createBackground(){

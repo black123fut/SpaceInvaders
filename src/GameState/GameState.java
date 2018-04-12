@@ -3,7 +3,6 @@ package GameState;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
@@ -14,7 +13,7 @@ import java.io.File;
 public class GameState
 {
     private Stage TheStage;
-    static int index = 4;
+    static int index;
     private static String nivel = " ";
     static int score;
 
@@ -32,6 +31,8 @@ public class GameState
     private GraphicsContext g;
 
     public GameState() {
+        TheStage = new Stage();
+
         //Panes y Scenes
         AnchorPane menuPane = new AnchorPane();
         Scene menuScene = new Scene(menuPane, WIDTH, HEIGHT);
@@ -48,8 +49,6 @@ public class GameState
         AnchorPane FinalPane = new AnchorPane();
         Scene FinalScene = new Scene(FinalPane, WIDTH, HEIGHT);
 
-        TheStage = new Stage();
-
         canvas1 = new Canvas(WIDTH, HEIGHT);
         canvas2 = new Canvas(WIDTH, HEIGHT);
         canvas3 = new Canvas(WIDTH, HEIGHT);
@@ -60,10 +59,10 @@ public class GameState
 
         //Niveles
         MenuState menuState = new MenuState(menuPane, TheStage, lvl1Scene);
-        Level1 lvl1State = new Level1(lvl1Pane, TheStage, Level2Scene);
-        Level2 level2State = new Level2(Level2Pane, TheStage, Level3Scene);
-        Level3 level3State = new Level3(Level3Pane);
-        FinalState finalState = new FinalState(FinalPane, TheStage, menuScene);
+        Level1 lvl1State = new Level1(lvl1Pane, TheStage, Level2Scene, FinalScene);
+        Level2 level2State = new Level2(Level2Pane, TheStage, Level3Scene, FinalScene);
+        Level3 level3State = new Level3(Level3Pane, TheStage, FinalScene);
+        FinalState finalState = new FinalState(FinalPane, TheStage);
 
         currentState = new LinkedList<>();
         currentState.add(menuState);
@@ -72,7 +71,7 @@ public class GameState
         currentState.add(level3State);
         currentState.add(finalState);
 
-        TheStage.setScene(FinalScene);
+        TheStage.setScene(menuScene);
     }
 
     public Stage getTheStage(){
@@ -110,6 +109,17 @@ public class GameState
                 nivel = "Nivel 2";
             else if (dato == 3)
                 nivel = "Nivel 3";
+            else if (dato == 4){
+                if (FinalState.condition.equals("Has Perdido")){
+                    AudioClip media = new AudioClip(new File("src/resources/sound/you_lose.mp3").toURI().toString());
+                    media.play();
+                }else{
+                    AudioClip media = new AudioClip(new File("src/resources/sound/you_win.mp3").toURI().toString());
+                    media.play();
+                }
+                nivel = "Nivel 4";
+            }
+
 
             if (theme != null && (nivel.equals("Nivel 1") || nivel.equals("Nivel 0"))) {
                 theme.setCycleCount(AudioClip.INDEFINITE);

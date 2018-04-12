@@ -1,7 +1,5 @@
 package GameState;
 
-import character.Enemy;
-import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -16,24 +14,40 @@ import java.io.FileNotFoundException;
 
 public class FinalState extends GameStateManager {
     private AnchorPane Pane;
-    private Scene MenuScene;
     private Stage TheStage;
-
     private Label titule;
     private Label score;
+    static String condition;
+    private boolean first = true;
 
-    public FinalState(AnchorPane Pane, Stage TheStage, Scene MenuScene){
+    public FinalState(AnchorPane Pane, Stage TheStage){
         this.Pane = Pane;
-        this.MenuScene = MenuScene;
         this.TheStage = TheStage;
 
         createButtons();
         createLabels();
-        createBackground();
     }
 
     @Override
     public void update() {
+        score.setText("Score: " + GameState.score);
+        titule.setText(condition);
+
+        if (first){
+            if (condition.equals("       Victoria")){
+                Image backgroundImage = new Image("resources/fondoVictory.png", true);
+                BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
+                        BackgroundPosition.DEFAULT, null);
+                Pane.setBackground(new Background(background));
+            } else if(condition.equals("Has Perdido")){
+                Image backgroundImage = new Image("resources/fondoDefeat.png", true);
+                BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
+                        BackgroundPosition.DEFAULT, null);
+                Pane.setBackground(new Background(background));
+
+            }
+            first = false;
+        }
 
     }
 
@@ -46,7 +60,6 @@ public class FinalState extends GameStateManager {
         try{
             titule = new Label();
             titule.setFont(Font.loadFont(new FileInputStream("src/resources/Future_thin.ttf"), 50));
-            titule.setText("Felicidades");
             titule.setTranslateX(540 / 2 - 170);
             titule.setTranslateY(150);
             titule.setTextFill(Color.valueOf("FFFFFF"));
@@ -57,7 +70,6 @@ public class FinalState extends GameStateManager {
             score.setTranslateX(240 - 45);
             score.setTranslateY(225);
             score.setTextFill(Color.valueOf("FFFFFF"));
-            score.setText("Score: " + GameState.score);
             Pane.getChildren().add(score);
 
         }catch (FileNotFoundException e){
@@ -66,28 +78,10 @@ public class FinalState extends GameStateManager {
     }
 
     private void createButtons(){
-        gameButton regretButton = new gameButton("Menu");
-        regretButton.setTranslateX(270 - 190 / 2);
-        regretButton.setTranslateY(350);
-        regretButton.setOnAction(e -> {
-            GameState.index = 0;
-            Enemy.speed = 1.5;
-            GameState.score = 0;
-            TheStage.setScene(MenuScene);
-        });
-        Pane.getChildren().add(regretButton);
-
         gameButton exit = new gameButton("Salir");
         exit.setTranslateX(270 - 190 / 2);
-        exit.setTranslateY(450);
+        exit.setTranslateY(300);
         exit.setOnAction(e -> TheStage.close());
         Pane.getChildren().add(exit);
-    }
-
-    private void createBackground(){
-        Image backgroundImage = new Image("resources/fondo1.jpg", true);
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, null);
-        Pane.setBackground(new Background(background));
     }
 }
