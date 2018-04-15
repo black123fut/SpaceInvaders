@@ -44,6 +44,12 @@ public class Level3 extends GameStateManager {
     private boolean sceneRun = true;
     private Label level;
 
+    /**
+     * Constructor
+     * @param Pane AnchorPane del nivel 3
+     * @param TheStage Stage principal de la aplicacion
+     * @param FinalScene Scene a cambiar si el jugador gana o pierde
+     */
     Level3(AnchorPane Pane, Stage TheStage, Scene FinalScene){
         this.Pane = Pane;
         this.TheStage = TheStage;
@@ -55,27 +61,34 @@ public class Level3 extends GameStateManager {
 
         MainEnemyList = new LinkedList<>();
 
+        //Crea varios elementos del juego
         createSubScene();
         createLabels();
         generateRows();
         createBackground();
     }
 
+    /**
+     * Actualiza a los objetos
+     */
     @SuppressWarnings("Duplicates")
     @Override
     public void update() {
+        //Hace la animacion que muestra el nivel
         if(sceneRun){
             subScene.startSubScene();
             sceneRun = false;
         }
 
+        //Conecta el servidor si se le esta dando uso
         if (server.getConnected()){
             if (firstRun){
                 serverConnect();
                 firstRun = false;
             }
         }
-        //Player
+
+        //Muestra al jugador
         Pane.getScene().setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.RIGHT)
                 player.setRight(true);
@@ -88,7 +101,7 @@ public class Level3 extends GameStateManager {
                 player.setRight(false);
             if (e.getCode() == KeyCode.LEFT)
                 player.setLeft(false);
-            if (e.getCode() == KeyCode.SPACE)
+            if (e.getCode() == KeyCode.SPACE || e.getCode() == KeyCode.Z)
                 bullets.add(new Bullet(player.getX(), player.getY()));
         });
 
@@ -108,6 +121,7 @@ public class Level3 extends GameStateManager {
                 for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
                     MainEnemyList.get(current).get(i).update();
 
+                    //Si algun enemigo llega a la posicion de la nave, la aplicacion cambia a la escena de derrota
                     if (MainEnemyList.get(current).get(i).getY() > 620){
                         GameState.index = 4;
                         FinalState.condition = "Has Perdido";
@@ -122,20 +136,26 @@ public class Level3 extends GameStateManager {
             }
         } else{
             GameState.index = 4;
-            FinalState.condition = "       Victoria";
+            FinalState.condition = "      Victoria";
             TheStage.setScene(FinalScene);
         }
 
         collisionController(MainEnemyList.get(current));
 
+        //Cambia a la siguiente hilera, cuando la actual se queda sin enemigos
         if (MainEnemyList.get(current).length() == 0) {
             current++;
             Enemy.speed += 0.15;
             eRun = true;
         }
+        //Actualiza los label
         updateLabels();
     }
 
+    /**
+     * Dibuja los objetos que estan en uso
+     * @param g Dibuja en el canvas los objetos
+     */
     @Override
     public void render(GraphicsContext g) {
         g.clearRect(0 , 0, 540, 720);
@@ -151,6 +171,10 @@ public class Level3 extends GameStateManager {
         }
     }
 
+    /**
+     * Crea a los objetos de enemigo en la lista
+     * @param EnemyList Lista de enemigos
+     */
     private void createAliens(ListModel<Enemy> EnemyList) {
         String[][] images = {{"resources/Alien1.png", "resources/Alien2.png"},
                 {"resources/Alien1green.png", "resources/Alien2green.png"},
@@ -171,7 +195,7 @@ public class Level3 extends GameStateManager {
         if (EnemyList.getType().equals(""))
             yPos = -150;
 
-
+        //Si la hilera es de clase E, crea al jefe en el centro
         if (EnemyList.getType().equals("ClaseE")) {
             for (int i = 0; i < 7; i++) {
                 int life = (int) (Math.random() * 5) + 1;
@@ -184,7 +208,9 @@ public class Level3 extends GameStateManager {
                 }
                 xPos--;
             }
-        } else {
+        }
+        //Si no es Clase E, crea al jefe en una posicion random
+        else {
             for (int i = 0; i < 7; i++) {
                 int life = (int) (Math.random() * 6) + 1;
                 if (i == boss)
@@ -196,21 +222,28 @@ public class Level3 extends GameStateManager {
                 xPos--;
             }
         }
+        //Ordena a los enemigos de mayor a menor resistencia
         if (!EnemyList.getType().equals("ClaseE")) {
             if (EnemyList.length() != 1)
                 keepSorted(EnemyList);
         }
     }
 
+    /**
+     * Verifica las colisiones entre balas y enemigos
+     * @param EnemyList Lista de enemigos
+     */
     private void collisionController(ListModel<Enemy> EnemyList){
         for (int i = 0; i < bullets.length(); i++) {
             Bullet bullet = bullets.get(i);
 
             for (int j = 0; j < EnemyList.length(); j++) {
                 if (bullet.isColliding(EnemyList.get(j))){
+                    //Baja la vida a los enemigos
                     if (EnemyList.get(j).getLife() != 1)
                         EnemyList.get(j).setLife(EnemyList.get(j).getLife() - 1);
                     else {
+                        //Si es hilera D o E, el jefe toma el control de algun otro alien.
                         if (EnemyList.getType().equals("ClaseD") || EnemyList.getType().equals("ClaseE")){
                             boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
                             int toReplace = 0;
@@ -227,6 +260,7 @@ public class Level3 extends GameStateManager {
                                 EnemyList.get(toReplace).setImages(bossImages);
                             }
                         }
+                        //Si es hilera C cambia al jefe de posicion
                         else if (EnemyList.getType().equals("ClaseC")){
                             boolean isBoss = EnemyList.get(j).getID().equals("BOSS");
 
@@ -237,10 +271,12 @@ public class Level3 extends GameStateManager {
                             else
                                 positionChanger(EnemyList, "ClaseC");
                         }
+                        //Si es hilera B pasa a la siguiente hilera
                         else if (EnemyList.getType().equals("ClaseB") && EnemyList.get(j).getID().equals("BOSS")){
                             GameState.score += EnemyList.get(j).getScore();
                             current++;
                         }
+                        //Si no solo elimina al alien
                         else{
                             GameState.score += EnemyList.get(j).getScore();
                             EnemyList.remove(j);
@@ -248,7 +284,7 @@ public class Level3 extends GameStateManager {
 
                     }
                     bullets.remove(i);
-
+                    //Mantiene ordenados a los aliens
                     if (!EnemyList.getType().equals("ClaseE"))
                         keepSorted(EnemyList);
                 }
@@ -256,18 +292,23 @@ public class Level3 extends GameStateManager {
         }
     }
 
+    /**
+     * Hace que la hilera de aliens rote en la direccion de las manecillas del reloj.
+     * @param EnemyList Lista de enemigos
+     */
     private void rotate(ListModel<Enemy> EnemyList){
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
 
         final long timeStart = System.currentTimeMillis();
-
+        //Hace que actualizen su posicion 60 veces por segundo
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.017), ae -> {
             if (EnemyList == MainEnemyList.get(current)){
                 double t = (System.currentTimeMillis() - timeStart) / 1000.0;
                 double x, y, pos = 1.75;
                 int bossNumber = EnemyList.length() / 2, leftSide = 0, rightSide = 0, xPos = EnemyList.length();
 
+                //Busca el indice del jefe.
                 for (int i = 0; i < EnemyList.length(); i++) {
                     if (EnemyList.get(i).getID().equals("BOSS")){
                         bossNumber = i;
@@ -276,17 +317,21 @@ public class Level3 extends GameStateManager {
                     xPos--;
                 }
 
+                //Solo actualiza la posicion del jefe.
                 EnemyList.get(bossNumber).update(bossNumber, xPos);
 
+                //Cuando el jefe llega a la posicion de la nave, el jugador pierde.
                 if (EnemyList.get(bossNumber).getY() > 620){
                     GameState.index = 4;
                     FinalState.condition = "Has Perdido";
                     TheStage.setScene(FinalScene);
                 }
 
+                //Toma la posicion en X y Y del jefe
                 x = EnemyList.get(bossNumber).getX();
                 y = EnemyList.get(bossNumber).getY();
 
+                //Condiciones que ayudan a que los aliens permanescan unidos.
                 if (EnemyList.length() < 6)
                     pos = 0.60;
                 if(EnemyList.length() < 4)
@@ -295,6 +340,7 @@ public class Level3 extends GameStateManager {
                     pos = -1;
 
                 for (int i = 0; i < EnemyList.length(); i++) {
+                    //Hace que los aliens roten al rededor de la posicion en X y Y del jefe.
                     if (i < bossNumber) {
                         EnemyList.get(i).setXandY(
                                 x + (55 + 55 * i) * Math.cos(t),
@@ -312,6 +358,7 @@ public class Level3 extends GameStateManager {
                         rightSide++;
                     }
                 }
+
                 if((leftSide == 1 && rightSide == 3) || (rightSide == 1 && leftSide == 3) ||
                         (leftSide == 0 && rightSide == 2) || (rightSide == 0 && leftSide == 2)){
                     inMiddle(EnemyList);
@@ -321,14 +368,20 @@ public class Level3 extends GameStateManager {
         timeline.playFromStart();
     }
 
+    /**
+     * Hace que el jefe permanezca en el centro.
+     * @param EnemyList Lista de enemigos.
+     */
     private void inMiddle(ListModel<Enemy> EnemyList){
         int tmpBoss = 0, change = (EnemyList.length() - (EnemyList.length() + 1) / 2);
 
+        //Busca la posicion del jefe
         for (int i = 0; i < EnemyList.length(); i++) {
             if (EnemyList.get(i).getID().equals("BOSS"))
                 tmpBoss = i;
         }
 
+        //Toma la posicion del jefe y del alien que esta en el centro.
         double Xchange = EnemyList.get(change).getX(),
                 Ychange = EnemyList.get(change).getY(),
                 iRchange = EnemyList.get(change).getiR(),
@@ -339,6 +392,7 @@ public class Level3 extends GameStateManager {
                 , iRboss = EnemyList.get(tmpBoss).getiR()
                 , iLboss = EnemyList.get(tmpBoss).getiL();
 
+        //Los cambia la posicion del alien que esta en el centro, con el jefe
         EnemyList.get(tmpBoss).setPosition(
                 Xchange, Ychange,
                 iRchange, iLchange
@@ -349,6 +403,7 @@ public class Level3 extends GameStateManager {
                 iRboss, iLboss
         );
 
+        //Cambia los nodos del jefe y el otro alien
         NodeModel<Enemy> node1 = EnemyList.getNode(change);
         NodeModel<Enemy> node2 = EnemyList.getNode(tmpBoss);
         CircularNode<Enemy> tmp = new CircularNode<>(node1.getData());
@@ -357,6 +412,7 @@ public class Level3 extends GameStateManager {
         node2.setData(tmp.getData());
 
         int xPos = EnemyList.length();
+        //Permite que los enemigos permanescan unidos.
         for (int i = 0; i < EnemyList.length(); i++) {
             if(EnemyList.get(i).getID().equals("BOSS")){
                 if (EnemyList.get(i).getX() < 55 * i){
@@ -370,6 +426,10 @@ public class Level3 extends GameStateManager {
         }
     }
 
+    /**
+     * La hilera de aliens permanece unida, y si es clase D los ordena de mayor a menor segun su vida.
+     * @param EnemyList Lsita de enemigos.
+     */
     private void keepSorted(ListModel<Enemy> EnemyList){
         double lastX = 0;
 
@@ -383,17 +443,22 @@ public class Level3 extends GameStateManager {
             bubbleSort(EnemyList);
 
         int xPos = EnemyList.length();
+
         for (int i = 0; i < EnemyList.length(); i++) {
             EnemyList.get(i).setPosition(lastX + 55 * i, EnemyList.get(i).getY(), xPos, i);
             xPos--;
         }
     }
 
+    /**
+     * Cambia al jefe de posicion cada 3 segundos.
+     * @param EnemyList Lista de enemigos.
+     */
     private void bossTransition(ListModel<Enemy> EnemyList){
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(
-                new KeyFrame(Duration.seconds(4),
+                new KeyFrame(Duration.seconds(3),
                         e -> {
                             if (EnemyList.length() != 1)
                                 positionChanger(EnemyList, EnemyList.getType());
@@ -401,6 +466,9 @@ public class Level3 extends GameStateManager {
         timeline.playFromStart();
     }
 
+    /**
+     * Crea el fondo del nivel.
+     */
     private void createBackground() {
         Image backgroundImage = new Image("resources/background_game.png", true);
         BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
@@ -409,6 +477,9 @@ public class Level3 extends GameStateManager {
         Pane.setBackground(new Background(background));
     }
 
+    /**
+     * Da al servidor la lista de balas y el jugador que se estan usando, para que el control funcione con ellos.
+     */
     @SuppressWarnings("Duplicates")
     private void serverConnect() {
         server.setPlayer(player);
@@ -419,11 +490,17 @@ public class Level3 extends GameStateManager {
         thread.start();
     }
 
+    /**
+     * Crea la clase de las animaciones.
+     */
     private void createSubScene() {
         subScene = new LevelTransition("Nivel 3");
         Pane.getChildren().add(subScene);
     }
 
+    /**
+     * Actualiza la informacion de los label.
+     */
     @SuppressWarnings("Duplicates")
     private void updateLabels(){
         String text1 = "Actual: " + MainEnemyList.get(current).getType();
@@ -434,14 +511,19 @@ public class Level3 extends GameStateManager {
         else
             text2 += MainEnemyList.get(current + 1).getType();
 
+        //Actualiza con los textos nuevos.
         level.setText(GameState.getNivel());
         label.setText(text1);
         subLabel.setText(text2);
         score.setText("Score: " + GameState.score);
 
+        //Manda la informacion de los label al control de android.
         server.setToSend(GameState.getNivel() + ", "+ label.getText() + ", " + subLabel.getText() + ", " + score.getText());
     }
 
+    /**
+     * Crea los label.
+     */
     private void createLabels() {
         try {
             level = new Label();
@@ -477,6 +559,9 @@ public class Level3 extends GameStateManager {
         }
     }
 
+    /**
+     * Crea las hileras de aliens de diferente tipo aleatoriamente.
+     */
     private void generateRows(){
         for (int i = 0; i < 6; i++) {
             int rowType = (int) (Math.random() * 4);

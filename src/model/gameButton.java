@@ -17,6 +17,10 @@ public class gameButton extends Button {
     private static final String IMAGEN_BOTON = "-fx-background-color: transparent;" +
             " -fx-background-image: url('/resources/buttonLong_blue.png')";
 
+    /**
+     * Constructor.
+     * @param texto Texto del boton.
+     */
     public gameButton(String texto){
         setText(texto);
         setButtonFont();
@@ -26,22 +30,34 @@ public class gameButton extends Button {
         initializeButtonListeners();
     }
 
+    /**
+     * Fuente de la letra.
+     */
     private void setButtonFont(){
         setFont(Font.font("Verdana", 23));
     }
 
+    /**
+     * Cambia el estilo del boton cuando es presionado.
+     */
     private void setBotonPresionadoStyle(){
         setStyle(IMAGEN_BOTON_PRESIONADO);
         setPrefHeight(45);
         setLayoutY(getLayoutY() + 4);
     }
 
+    /**
+     * Cambia el estilo del boton no esta siendo presionado.
+     */
     private void setBotonReleasedStyle(){
         setStyle(IMAGEN_BOTON);
         setPrefHeight(45);
         setLayoutY(getLayoutY() - 4);
     }
 
+    /**
+     * Efectos del boton.
+     */
     private void initializeButtonListeners(){
 
         setOnMousePressed(new EventHandler<MouseEvent>() {

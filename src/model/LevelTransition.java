@@ -22,27 +22,38 @@ public class LevelTransition extends SubScene {
     private BackgroundImage image;
     private int currentIndex = 0;
 
+    /**
+     * Constructor
+     * @param level El texto que debe ensenar la animacion.
+     */
     public LevelTransition(String level){
         super(new AnchorPane(), 440, 80);
         prefWidth(80);
         prefHeight(440);
 
+        //Agrega todas las imagenes de la animacion a la lista.
         animation = new LinkedList<>();
         for (int i = 1; i < 9; i++) {
             animation.add("resources/flag/flag" + i + ".png");
         }
 
+        //Pane de la SubScene
         subAnchor = (AnchorPane) this.getRoot();
         createLabel(level);
         setLayoutX(-440);
         setLayoutY(320);
     }
 
+    /**
+     * Empieza la animacion del nivel nuevo.
+     */
     public void startSubScene(){
+        //Mueve a la SubScene
         TranslateTransition transtion = new TranslateTransition();
         transtion.setDuration(Duration.seconds(6));
         transtion.setNode(this);
 
+        //Hace el cambio de la imagen del fondo.
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(
@@ -63,6 +74,10 @@ public class LevelTransition extends SubScene {
         transtion.play();
     }
 
+    /**
+     * Crea el texto de la animacion.
+     * @param level Texto que se quiere en la animacion.
+     */
     private void createLabel(String level){
         try{
             Label label = new Label(level);

@@ -5,11 +5,18 @@ public class DoubleLinkedList<T> implements ListModel<T>{
     private String type;
     private int size;
 
+    /**
+     * Constructor.
+     */
     public DoubleLinkedList(){
         this.head = null;
         this.size = 0;
     }
 
+    /**
+     * Agrega un nodo al fianl de la lista.
+     * @param data El objeto del nuevo nodo.
+     */
     public void add(T data){
         if (this.head == null)
             head = new DoubleNode<>(data, null, null);
@@ -28,6 +35,10 @@ public class DoubleLinkedList<T> implements ListModel<T>{
         size++;
     }
 
+    /**
+     * Elimina un nodo de la lista.
+     * @param index Indice del nodo.
+     */
     public void remove(int index){
         int cont = 0;
 
@@ -59,6 +70,11 @@ public class DoubleLinkedList<T> implements ListModel<T>{
         }
     }
 
+    /**
+     * Obtiene el objeto que almacena el nodo.
+     * @param index Indice del nodo.
+     * @return El objeto del nodo.
+     */
     public T get(int index){
         if (head != null){
             DoubleNode<T> tmp = head;
@@ -75,16 +91,27 @@ public class DoubleLinkedList<T> implements ListModel<T>{
         return null;
     }
 
-
+    /**
+     * Obtiene el largo de la lista.
+     * @return El largo de la lista.
+     */
     public int length(){
         return size;
     }
 
+    /**
+     * Asigna el tipo de la lista.
+     * @param type El tipo de la lista.
+     */
     @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Obtiene el tipo de la lista.
+     * @return El tipo de la lista.
+     */
     @Override
     public String getType() {
         return type;

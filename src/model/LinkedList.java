@@ -5,10 +5,17 @@ public class LinkedList<T> implements ListModel<T>{
     private int size;
     private String type;
 
+    /**
+     * Construtor
+     */
     public LinkedList(){
         head = null;
     }
 
+    /**
+     * Agrega un nuevo nodo al final de la lista.
+     * @param item Valor del nuevo nodo.
+     */
     public void add(T item){
         if (head == null)
             head = new Node<>(item, null);
@@ -21,6 +28,10 @@ public class LinkedList<T> implements ListModel<T>{
         size++;
     }
 
+    /**
+     * Elimina un nodo de la lista.
+     * @param index Indice del nodo.
+     */
     public void remove(int index) {
         try{
             Node tmp = head;
@@ -54,10 +65,19 @@ public class LinkedList<T> implements ListModel<T>{
         }
     }
 
+    /**
+     * Obtiene el largo de la lista.
+     * @return El largo de la lista.
+     */
     public int length(){
         return size;
     }
 
+    /**
+     * Obtiene el valor del nodo.
+     * @param indice Indice del nodo.
+     * @return El valor del nodo.
+     */
     public T get(int indice){
         Node<T> tmp = head;
         int cont = 0;
@@ -73,10 +93,18 @@ public class LinkedList<T> implements ListModel<T>{
         return null;
     }
 
+    /**
+     * Asigna el tipo de la lista.
+     * @param type Tipo de la lista.
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Obtiene el valor de la lista.
+     * @return El valor de la lista.
+     */
     public String getType(){
         return type;
     }

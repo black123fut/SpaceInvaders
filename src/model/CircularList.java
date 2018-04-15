@@ -5,12 +5,18 @@ public class CircularList<T> implements ListModel<T>{
     private String type;
     private int size;
 
-
+    /**
+     * Constructor
+     */
     public CircularList(){
         this.head = null;
         this.size = 0;
     }
 
+    /**
+     * Crea un nuevo nodo antes del head.
+     * @param data Objeto que se va a guardar en el nodo.
+     */
     @Override
     public void add(T data){
         CircularNode<T> newNode = new CircularNode<>(data);
@@ -35,6 +41,10 @@ public class CircularList<T> implements ListModel<T>{
         size++;
     }
 
+    /**
+     * Remueve un nodo de la lista.
+     * @param index Indice del nodo.
+     */
     @Override
     public void remove(int index){
         if (head != null){
@@ -72,6 +82,11 @@ public class CircularList<T> implements ListModel<T>{
         }
     }
 
+    /**
+     * Obtiene la informacion del nodo.
+     * @param index Indice del nodo.
+     * @return El objeto que se buscaba.
+     */
     @Override
     public T get(int index){
         int count = 0;
@@ -90,6 +105,11 @@ public class CircularList<T> implements ListModel<T>{
         return null;
     }
 
+    /**
+     * Obtiene un nodo.
+     * @param index Indice del nodo.
+     * @return El nodo que se buscaba.
+     */
     @SuppressWarnings("Duplicates")
     public CircularNode<T> getNode(int index){
         int cont = 0;
@@ -108,15 +128,27 @@ public class CircularList<T> implements ListModel<T>{
         return null;
     }
 
+    /**
+     * Obtiene el largo de la lista.
+     * @return El largo de la lista.
+     */
     public int length(){
         return size;
     }
 
+    /**
+     * Da el tipo que es la lista.
+     * @param type Tipo de hilera que se va a usar.
+     */
     @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Obtiene el tipo de hilera de la lista.
+     * @return Tipo de hilera de la lista.
+     */
     @Override
     public String getType() {
         return type;

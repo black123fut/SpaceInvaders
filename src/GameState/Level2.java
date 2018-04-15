@@ -43,6 +43,13 @@ public class Level2 extends GameStateManager{
     private boolean SceneRun = true;
     private Label level;
 
+    /**
+     * Constructor
+     * @param Pane AnchorPane del nivel 2
+     * @param TheStage Stage principal de la aplicacion
+     * @param Level3Scene Scene del siguiente nivel
+     * @param FinalScene Scene a cambiar si el jugador pierde
+     */
     Level2(AnchorPane Pane, Stage TheStage, Scene Level3Scene, Scene FinalScene){
         this.Pane = Pane;
         this.TheStage = TheStage;
@@ -55,29 +62,35 @@ public class Level2 extends GameStateManager{
         current = 0;
 
         MainEnemyList = new LinkedList<>();
+
+        //Crea varios elementos importantes en el juego
         createBackground();
         createLabels();
         createSubScene();
         generateRows();
-
     }
 
+    /**
+     * Actualiza a los objetos del nivel 2
+     */
     @SuppressWarnings("Duplicates")
     @Override
     public void update() {
         try{
+            //Si llega a la hilera 6 cambia al siguiente nivel
             if (current == 6){
                 TheStage.setScene(Level3Scene);
                 GameState.index++;
                 Enemy.speed = 3.6;
             }
 
+            //Hace la animacion que muestra el nivel
             if (SceneRun){
                 subScene.startSubScene();
                 SceneRun = false;
             }
 
-
+            //si el servidor esta en uso sigue corriendo el servidor
             if (server.getConnected()){
                 if (firstRun){
                     serverConnect();
@@ -97,7 +110,7 @@ public class Level2 extends GameStateManager{
                     player.setLeft(false);
                 if (e.getCode() == KeyCode.RIGHT)
                     player.setRight(false);
-                if (e.getCode() == KeyCode.SPACE)
+                if (e.getCode() == KeyCode.SPACE || e.getCode() == KeyCode.Z)
                     bullets.add(new Bullet(player.getX(), player.getY()));
             });
 
@@ -120,6 +133,7 @@ public class Level2 extends GameStateManager{
                 for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
                     MainEnemyList.get(current).get(i).update();
 
+                    //Cambia la scene a la de derrota
                     if (MainEnemyList.get(current).get(i).getY() > 620){
                         GameState.index = 4;
                         FinalState.condition = "Has Perdido";
@@ -128,6 +142,7 @@ public class Level2 extends GameStateManager{
                 }
             }
 
+            //Cambia a la siguiente hilera cuando la actual no quedan enemigos
             if (MainEnemyList.get(current).length() == 0) {
                 current++;
                 Enemy.speed += 0.25;
@@ -139,6 +154,10 @@ public class Level2 extends GameStateManager{
         }
     }
 
+    /**
+     * Dibuja a los objetos ya actualizados
+     * @param g Dibuja en el canvas a los objetos
+     */
     @Override
     public void render(GraphicsContext g) {
         g.clearRect(0 , 0, 540, 720);
@@ -154,6 +173,10 @@ public class Level2 extends GameStateManager{
         }
     }
 
+    /**
+     * Verifica las colisiones entre aliens y balas
+     * @param EnemyList Lista de enemigos
+     */
     private void collisionController(ListModel<Enemy> EnemyList){
         for (int i = 0; i < bullets.length(); i++) {
 
@@ -163,6 +186,7 @@ public class Level2 extends GameStateManager{
                 
                 if (bullet.isColliding(EnemyList.get(j))){
 
+                    //Si el enemigo colisionado es un jefe, lo manda a su tipo de colision
                     if (EnemyList.get(j).getID().equals("BOSS")){
                         if (!EnemyList.getType().equals("Basic"))
                             collisionForBoss(EnemyList, EnemyList.getType());
@@ -184,6 +208,7 @@ public class Level2 extends GameStateManager{
 
                         int count = EnemyList.length();
 
+                        //Acomoda a los aliens para que sigan unidos
                         for (int k = 0; k < EnemyList.length(); k++) {
                             EnemyList.get(k).setPosition(
                                     lastX + 55 * k,
@@ -197,15 +222,22 @@ public class Level2 extends GameStateManager{
         }
     }
 
+    /**
+     * Le baja la vida al jefe, y si su vida es 0 lo elimina
+     * @param EnemyList Lista de enemigos
+     * @param type Tipo de la hilera
+     */
     private void collisionForBoss(ListModel<Enemy> EnemyList, String type){
         for (int i = 0; i < EnemyList.length(); i++) {
             if (EnemyList.get(i).getLife() != 1)
                 EnemyList.get(i).setLife(EnemyList.get(i).getLife() - 1);
             else
+                //Cambia a la siguiente hilera
                 if (type.equals("ClaseB") || type.equals("ClaseA") || (type.equals("ClaseC") && EnemyList.length() == 1)){
                     GameState.score += EnemyList.get(i).getScore();
                     current++;
                 }
+                //Si es tipo C hace que el jefe, algun alien basico se convierte en el jefe
                 else if(type.equals("ClaseC"))
                     positionChanger(EnemyList, type);
         }
@@ -224,14 +256,19 @@ public class Level2 extends GameStateManager{
         else
             text2 += MainEnemyList.get(current + 1).getType();
 
+        //Actualiza la informacion de cada Label
         level.setText(GameState.getNivel());
         label.setText(text1);
         subLabel.setText(text2);
         scoreLabel.setText("Score: " + GameState.score);
 
+        //Manda la informacion de los Label al control de android
         server.setToSend(GameState.getNivel() + ", "+ label.getText() + ", " + subLabel.getText() + ", " + scoreLabel.getText());
     }
 
+    /**
+     * Crea el fondo de la pantalla
+     */
     private void createBackground() {
         Image backgroundImage = new Image("resources/background_game.png", true);
         BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
@@ -240,6 +277,9 @@ public class Level2 extends GameStateManager{
         Pane.setBackground(new Background(background));
     }
 
+    /**
+     * Crea los Label del nivel
+     */
     private void createLabels() {
         try {
             level = new Label();
@@ -275,6 +315,11 @@ public class Level2 extends GameStateManager{
         }
     }
 
+    /**
+     * Crea a los aliens de hilera basica
+     * @param enemyList Lista donde se crearan los enemigos
+     * @param basicY Posicion en Y donde apareceran los enemigos
+     */
     private void createAliens(ListModel<Enemy> enemyList, int basicY){
         String[] images = {"resources/Alien1.png", "resources/Alien2.png"};
 
@@ -290,7 +335,10 @@ public class Level2 extends GameStateManager{
         }
     }
 
-
+    /**
+     * Crea a las hileras de enemigo que ocupen un jefe
+     * @param EnemyList Lista donde se crearan los enemigos
+     */
     private void createAliens(ListModel<Enemy> EnemyList){
         String[] images = {"resources/Alien1.png", "resources/Alien2.png"};
         String[] bossImages = {"resources/AlienBoss1.png", "resources/AlienBoss2.png"};
@@ -308,6 +356,10 @@ public class Level2 extends GameStateManager{
         }
     }
 
+    /**
+     * Hace que el jefe cada 4 segundos cambie de posicion con algun otro alien
+     * @param EnemyList Lista de enemigos
+     */
     private void bossTransition(ListModel<Enemy> EnemyList){
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -320,6 +372,10 @@ public class Level2 extends GameStateManager{
         timeline.playFromStart();
     }
 
+    /**
+     * Si el servidor esta en uso, entonces se le da la instancia del jugador y la lista de balas
+     * que se esta usando, y permite controlarlos por medio del control de android.
+     */
     @SuppressWarnings("Duplicates")
     private void serverConnect(){
         server.setPlayer(player);
@@ -330,6 +386,9 @@ public class Level2 extends GameStateManager{
         thread.start();
     }
 
+    /**
+     * Crea la subscene para las animaciones
+     */
     private void createSubScene() {
         subScene = new LevelTransition("Nivel 2");
         Pane.getChildren().add(subScene);

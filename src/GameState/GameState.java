@@ -25,11 +25,13 @@ public class GameState
     private Canvas canvas1;
     private Canvas canvas2;
     private Canvas canvas3;
+    private GraphicsContext g;
 
     private AudioClip theme;
 
-    private GraphicsContext g;
-
+    /**
+     * Constructor
+     */
     public GameState() {
         TheStage = new Stage();
 
@@ -49,6 +51,7 @@ public class GameState
         AnchorPane FinalPane = new AnchorPane();
         Scene FinalScene = new Scene(FinalPane, WIDTH, HEIGHT);
 
+        //Canvas de cada Nivel
         canvas1 = new Canvas(WIDTH, HEIGHT);
         canvas2 = new Canvas(WIDTH, HEIGHT);
         canvas3 = new Canvas(WIDTH, HEIGHT);
@@ -74,10 +77,17 @@ public class GameState
         TheStage.setScene(menuScene);
     }
 
+    /**
+     * retorna el Stage
+     * @return Stage
+     */
     public Stage getTheStage(){
         return TheStage;
     }
 
+    /**
+     * actualiza y dibuja la pantalla actual
+     */
     public void init(){
         if (index == 1)
             g = canvas1.getGraphicsContext2D();
@@ -85,23 +95,34 @@ public class GameState
             g = canvas2.getGraphicsContext2D();
         if (index == 3)
             g = canvas3.getGraphicsContext2D();
-        setNivel(index);
+
+        setNivelandSound(index);
         currentState.get(index).update();
         currentState.get(index).render(g);
     }
 
+    /**
+     * Da el valor del nivel actual
+     * @return El valor del nivel actual
+     */
     static String getNivel(){
         return nivel;
     }
 
-    private void setNivel(int dato){
+    /**
+     * Asigna el valor correspondiente del nivel, y pone la musica al juego.
+     * @param dato el indice actual de la lista de niveles
+     */
+    private void setNivelandSound(int dato){
         if(!nivel.equals("Nivel " + dato)){
             if (dato == 0){
+                //Soundtrack del menu
                 theme = new AudioClip(new File("src/resources/sound/menuTheme.mp3").toURI().toString());
                 nivel = "Nivel 0";
             }
             else if (dato == 1){
                 theme.stop();
+                //Soundtrack del juego
                 theme = new AudioClip(new File("src/resources/sound/theme.mp3").toURI().toString());
                 nivel = "Nivel 1";
             }
@@ -119,7 +140,6 @@ public class GameState
                 }
                 nivel = "Nivel 4";
             }
-
 
             if (theme != null && (nivel.equals("Nivel 1") || nivel.equals("Nivel 0"))) {
                 theme.setCycleCount(AudioClip.INDEFINITE);

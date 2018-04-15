@@ -1,18 +1,12 @@
 package sample;
-import Server.Server;
 import GameState.GameState;
-import GameState.Level1;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import GameState.MenuState;
-import model.LinkedList;
 
-import java.awt.*;
 
 
 public class Main extends Application
@@ -35,7 +29,7 @@ public class Main extends Application
             new AnimationTimer(){
                 @Override
                 public void handle(long currentNanoTime){
-                    double elapsedTime = (currentNanoTime - System.nanoTime()) / 1000.0;
+//                    double elapsedTime = (currentNanoTime - System.nanoTime()) / 1000.0;
                     gameState.init();
                 }
             }.start();

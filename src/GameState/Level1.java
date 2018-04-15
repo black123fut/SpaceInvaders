@@ -40,6 +40,13 @@ public class Level1 extends GameStateManager{
 
     private LinkedList<LinkedList<Enemy>> MainEnemyList;
 
+    /**
+     * Constructor
+     * @param Lvl1Pane AnchorPane utilizado en el nivel 1
+     * @param TheStage El Stage principal de la aplicacion
+     * @param Level2Scene La Scene del siguiente nivel
+     * @param FinalScene La Scene a cambiar si el jugador pierde
+     */
     Level1(AnchorPane Lvl1Pane, Stage TheStage, Scene Level2Scene ,Scene FinalScene) {
         this.Lvl1Pane = Lvl1Pane;
         this.TheStage = TheStage;
@@ -53,6 +60,7 @@ public class Level1 extends GameStateManager{
 
         MainEnemyList = new LinkedList<>();
 
+        //Crea varios elementos importantes del juego
         createBackground();
         createSubScene();
         createLabels();
@@ -61,13 +69,15 @@ public class Level1 extends GameStateManager{
     }
 
     /**
-     * crea las hileras de aliens de manera aleatoria
+     * Crea las hileras de aliens de manera aleatoria
      */
     private void generateRows(){
+        //Agrega 5 listas enlazadas a la lista principal
         for (int i = 0; i < 5; i++) {
             MainEnemyList.add(new LinkedList<>());
         }
 
+        //Crea aleatoriamente hileras de clase Basica o A
         for (int i = 0; i < 4; i++) {
             int rowType = (int) (Math.random() * 2);
 
@@ -83,6 +93,11 @@ public class Level1 extends GameStateManager{
         createAliens(MainEnemyList.get(4), -150.0);
     }
 
+    /**
+     * Agrega 7 enemigos a las hileras
+     * @param enemyList Lista a la que se le agregan los enemigos
+     * @param bossNum Indice donde va a estar el jefe
+     */
     private void createAliens(LinkedList<Enemy> enemyList, int bossNum){
         String[] images = {"resources/Alien1.png", "resources/Alien2.png"};
         String[] bossImages = {"resources/AlienBoss1.png", "resources/AlienBoss2.png"};
@@ -101,6 +116,11 @@ public class Level1 extends GameStateManager{
         }
     }
 
+    /**
+     * Agrega 7 enemigos a las hileras
+     * @param enemyList Lista donde se agregan los enemigos
+     * @param posY Posicion en Y donde apareceran los enemigos
+     */
     private void createAliens(LinkedList<Enemy> enemyList, double posY){
         String[] images = {"resources/Alien1.png", "resources/Alien2.png"};
 
@@ -115,76 +135,83 @@ public class Level1 extends GameStateManager{
         }
     }
 
-    public void update() {
-        try{
-            if (current == 4){
-                TheStage.setScene(Level2Scene);
-                GameState.index++;
-                Enemy.speed = 2.5;
+    /**
+     * Actualiza los objetos
+     */
+public void update() {
+    try{
+        //Cuando llega al indice 4 cambia de Scene
+        if (current == 4){
+            TheStage.setScene(Level2Scene);
+            GameState.index++;
+            Enemy.speed = 2.5;
+        }
+
+        //Hace la animacion que muestra el nivel
+        if (firstRun){
+            subScene.startSubScene();
+            firstRun = false;
+        }
+
+        //Mueve al jugador
+        Lvl1Pane.getScene().setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.LEFT) {
+                player.setLeft(true);
             }
-
-            if (firstRun){
-                subScene.startSubScene();
-                firstRun = false;
+            if (e.getCode() == KeyCode.RIGHT) {
+                player.setRight(true);
             }
+        });
 
-            Lvl1Pane.getScene().setOnKeyPressed(e -> {
-                if (e.getCode() == KeyCode.LEFT) {
-                    player.setLeft(true);
-                }
-                if (e.getCode() == KeyCode.RIGHT) {
-                    player.setRight(true);
-                }
-            });
-
-            Lvl1Pane.getScene().setOnKeyReleased(e -> {
-                if (e.getCode() == KeyCode.RIGHT) {
-                    player.setRight(false);
-                }
-                if (e.getCode() == KeyCode.LEFT) {
-                    player.setLeft(false);
-                }
-                if (e.getCode() == KeyCode.SPACE)
-                    bullets.add(new Bullet(player.getX(), player.getY()));
-            });
-
-            //Player Bullets update
-            for (int i = 0; i < bullets.length(); i++) {
-                Bullet shoot = bullets.get(i);
-
-                if (shoot.getY() < -15) {
-                    bullets.remove(i);
-                }
-                shoot.update();
+        Lvl1Pane.getScene().setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.RIGHT) {
+                player.setRight(false);
             }
-            //collision
-            collisionController();
+            if (e.getCode() == KeyCode.LEFT) {
+                player.setLeft(false);
+            }
+            if (e.getCode() == KeyCode.SPACE || e.getCode() == KeyCode.Z)
+                bullets.add(new Bullet(player.getX(), player.getY()));
+        });
 
-            //Enemy update
-            if (current != MainEnemyList.length() - 1){
-                for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
-                    Enemy enemy = MainEnemyList.get(current).get(i);
-                    enemy.update();
-                    if (enemy.getY() > 620){
-                        TheStage.setScene(FinalScene);
-                        FinalState.condition = "Has Perdido";
-                        GameState.index = 4;
-                    }
+        //Player Bullets update
+        for (int i = 0; i < bullets.length(); i++) {
+            Bullet shoot = bullets.get(i);
+
+            if (shoot.getY() < -15) {
+                bullets.remove(i);
+            }
+            shoot.update();
+        }
+
+        //collision
+        collisionController();
+
+        //Enemy update
+        if (current != MainEnemyList.length() - 1){
+            for (int i = 0; i < MainEnemyList.get(current).length(); i++) {
+                Enemy enemy = MainEnemyList.get(current).get(i);
+                enemy.update();
+                //Cambia la scene a la de derrota
+                if (enemy.getY() > 620){
+                    TheStage.setScene(FinalScene);
+                    FinalState.condition = "Has Perdido";
+                    GameState.index = 4;
                 }
             }
+        }
 
-            //Control de hileras
-            if (MainEnemyList.get(current).length() == 0) {
-                current++;
-                Enemy.speed += 0.25;
-            }
+        //Control de hileras
+        if (MainEnemyList.get(current).length() == 0) {
+            current++;
+            Enemy.speed += 0.25;
+        }
 
-            player.update();
-            showRow();
+        player.update();
+        showRow();
 
-
-        } catch( NullPointerException e){
-            System.out.print("");
+    } catch(NullPointerException e){
+        System.out.print("");
         }
     }
 
@@ -199,6 +226,7 @@ public class Level1 extends GameStateManager{
                     if (bullet.isColliding(MainEnemyList.get(current).get(k))) {
                         double lastX = 0;
 
+                        //Si el enemigo que colisiono es un jefe, lo manda a su tipo de colision
                         if (MainEnemyList.get(current).get(k).getID().equals("BOSS")) {
 
                             if (MainEnemyList.get(current).getType().equals("ClaseA"))
@@ -216,6 +244,7 @@ public class Level1 extends GameStateManager{
 
                             int count = MainEnemyList.get(current).length();
 
+                            //Hace que la hilera de aliens se una
                             for (int l = 0; l < MainEnemyList.get(current).length(); l++) {
                                 MainEnemyList.get(current).get(l).setPosition(
                                         lastX + 55 * l,
@@ -232,6 +261,10 @@ public class Level1 extends GameStateManager{
         }
     }
 
+    /**
+     * Baja la vida al jefe y lo elimina cuando llega a 0
+     * @param EnemyList Lista de enemigos
+     */
     private void collisionClassA(LinkedList<Enemy> EnemyList){
         for (int i = 0; i < EnemyList.length(); i++) {
             if (EnemyList.get(i).getLife() != 1)
@@ -244,6 +277,10 @@ public class Level1 extends GameStateManager{
         }
     }
 
+    /**
+     * Dibuja los objetos que se estan utilizando en el nivel
+     * @param g Dibuja en el canvas
+     */
     public void render(GraphicsContext g){
         try{
             g.clearRect(0 , 0, 540, 720);
@@ -263,6 +300,9 @@ public class Level1 extends GameStateManager{
         }
     }
 
+    /**
+     * Actualiza y manda la informacion de los label a la aplicacion de celular
+     */
     private void showRow(){
         String hilera = "Actual: ";
         String next = "Siguiente: ";
@@ -285,17 +325,19 @@ public class Level1 extends GameStateManager{
         else if (MainEnemyList.get(current).getType().equals("Basic"))
             hilera += "Basic";
 
+        //Actuliza la informacion
         level.setText(GameState.getNivel());
         subLabel.setText(next);
         label.setText(hilera);
         scoreLabel.setText("Score: " + GameState.score);
+        //Manda la informacion al cliente
         server.setToSend(GameState.getNivel() + ", "+ label.getText() + ", " + subLabel.getText() + ", " + scoreLabel.getText());
         }
 
-
-
-    private void createBackground()
-    {
+    /**
+     * Crea el fondo del Pane
+     */
+    private void createBackground() {
         Image backgroundImage = new Image("resources/background_game.png", true);
         BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, null);
@@ -303,6 +345,9 @@ public class Level1 extends GameStateManager{
         Lvl1Pane.setBackground(new Background(background));
     }
 
+    /**
+     * Crea la clase de las animaciones
+     */
     private void createSubScene(){
         subScene = new LevelTransition("Nivel 1");
         Lvl1Pane.getChildren().add(subScene);
@@ -346,11 +391,15 @@ public class Level1 extends GameStateManager{
         }
     }
 
+    /**
+     * Da al servidor el jugador y la lista de balas para que puede interactuar con ellas
+     */
     @SuppressWarnings("Duplicates")
     private void connectSever() {
         server.setPlayer(player);
         server.setBullets(bullets);
 
+        //Permite correr el servidor sin que el thread principal deje de correr la interfaz del juego
         Thread thread = new Thread(() -> server.run());
         thread.setDaemon(true);
         thread.start();

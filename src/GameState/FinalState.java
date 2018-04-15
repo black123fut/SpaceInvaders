@@ -20,6 +20,11 @@ public class FinalState extends GameStateManager {
     static String condition;
     private boolean first = true;
 
+    /**
+     * Constructor
+     * @param Pane AnchorPane de la pantalla actual.
+     * @param TheStage Stage principal de la aplicacion.
+     */
     public FinalState(AnchorPane Pane, Stage TheStage){
         this.Pane = Pane;
         this.TheStage = TheStage;
@@ -28,13 +33,17 @@ public class FinalState extends GameStateManager {
         createLabels();
     }
 
+    /**
+     * Actualiza los elementos que se estan usando.
+     */
     @Override
     public void update() {
         score.setText("Score: " + GameState.score);
         titule.setText(condition);
 
+        //Pone el fondo de acuerdo a si gano o perdio.
         if (first){
-            if (condition.equals("       Victoria")){
+            if (condition.equals("      Victoria")){
                 Image backgroundImage = new Image("resources/fondoVictory.png", true);
                 BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
                         BackgroundPosition.DEFAULT, null);
@@ -56,6 +65,9 @@ public class FinalState extends GameStateManager {
 
     }
 
+    /**
+     * Crea los Label de esta pantalla.
+     */
     private void createLabels(){
         try{
             titule = new Label();
@@ -77,6 +89,9 @@ public class FinalState extends GameStateManager {
         }
     }
 
+    /**
+     * Crea el boton de esta pantalla.
+     */
     private void createButtons(){
         gameButton exit = new gameButton("Salir");
         exit.setTranslateX(270 - 190 / 2);

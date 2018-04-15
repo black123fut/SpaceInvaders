@@ -5,11 +5,18 @@ public class DoubleCircularList<T> implements ListModel<T> {
     private String type;
     private int size;
 
+    /**
+     * Constructor.
+     */
     public DoubleCircularList(){
         this.head = null;
         this.size = 0;
     }
 
+    /**
+     * Agrega un nuevo nodo antes del head.
+     * @param data Contenido que almacenara el nodo.
+     */
     public void add(T data){
         DoubleCircularNode<T> newNode = new DoubleCircularNode<>(data);
 
@@ -39,6 +46,10 @@ public class DoubleCircularList<T> implements ListModel<T> {
         size++;
     }
 
+    /**
+     * Elimina un nodo de la lista.
+     * @param index Indice del nodo.
+     */
     public void remove(int index){
         if (head != null){
             DoubleCircularNode<T> tmp = head;
@@ -71,6 +82,11 @@ public class DoubleCircularList<T> implements ListModel<T> {
         }
     }
 
+    /**
+     * Obtiene el objeto que almacena el nodo.
+     * @param index Indice del nodo.
+     * @return El dato del nodo.
+     */
     public T get(int index){
         int cont = 0;
 
@@ -87,20 +103,37 @@ public class DoubleCircularList<T> implements ListModel<T> {
         return null;
     }
 
+    /**
+     * El largo de la lista.
+     * @return El largo de la lista.
+     */
     public int length(){
         return size;
     }
 
+    /**
+     * El asigna el tipo de la lista.
+     * @param type El tipo de la lista.
+     */
     @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Obtiene el tipo de la lista.
+     * @return El tipo de la lista.
+     */
     @Override
     public String getType() {
         return type;
     }
 
+    /**
+     * Obtiene un nodo.
+     * @param index Indice del nodo.
+     * @return Un nodo.
+     */
     @Override
     @SuppressWarnings("Duplicates")
     public DoubleCircularNode<T> getNode(int index) {
