@@ -3,8 +3,7 @@ package character;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-public class Player
-{
+public class Player {
 
     private Image image = new Image("resources/player.png");
     private double x;

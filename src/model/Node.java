@@ -1,6 +1,6 @@
 package model;
 
-class Node<AnyType> {
+class Node<AnyType> implements  NodeModel<AnyType>{
     public AnyType data;
     public Node<AnyType> next;
 
@@ -16,5 +16,15 @@ class Node<AnyType> {
 
     public String toString(){
         return data + "";
+    }
+
+    @Override
+    public AnyType getData() {
+        return null;
+    }
+
+    @Override
+    public void setData(Object data) {
+
     }
 }

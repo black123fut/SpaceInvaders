@@ -360,7 +360,7 @@ public class Level2 extends GameStateManager{
      * Hace que el jefe cada 4 segundos cambie de posicion con algun otro alien
      * @param EnemyList Lista de enemigos
      */
-    private void bossTransition(ListModel<Enemy> EnemyList){
+    private void changePositionTimer(ListModel<Enemy> EnemyList){
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(
@@ -414,7 +414,7 @@ public class Level2 extends GameStateManager{
                 MainEnemyList.add(new DoubleLinkedList<>());
                 createAliens(MainEnemyList.get(i));
                 MainEnemyList.get(i).setType("ClaseB");
-                bossTransition(MainEnemyList.get(i));
+                changePositionTimer(MainEnemyList.get(i));
             }
             if (rowType == 3){
                 MainEnemyList.add(new CircularList<>());

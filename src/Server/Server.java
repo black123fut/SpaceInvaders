@@ -84,6 +84,7 @@ public class Server {
                 socket = serverSocket.accept();
                 if (!connected)
                     connected = true;
+
                 //Mada el mensaje al control.
                 dout = new DataOutputStream(socket.getOutputStream());
                 dout.writeUTF(toSend);
@@ -108,6 +109,7 @@ public class Server {
                 }
                 if (message.equals("Fire"))
                     bullets.add(new Bullet(player.getX(), player.getY()));
+
             }
         } catch (IOException e) {
             System.out.print("");

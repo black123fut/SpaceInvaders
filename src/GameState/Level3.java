@@ -94,6 +94,13 @@ public class Level3 extends GameStateManager {
                 player.setRight(true);
             if (e.getCode() == KeyCode.LEFT)
                 player.setLeft(true);
+            if (e.getCode() == KeyCode.O){
+                if (Enemy.speed < 3.6)
+                    Enemy.speed += 1.5;
+                else
+                    Enemy.speed -= 1.5;
+            }
+
         });
 
         Pane.getScene().setOnKeyReleased(e ->{
@@ -225,7 +232,7 @@ public class Level3 extends GameStateManager {
         //Ordena a los enemigos de mayor a menor resistencia
         if (!EnemyList.getType().equals("ClaseE")) {
             if (EnemyList.length() != 1)
-                keepSorted(EnemyList);
+                sortAlienRows(EnemyList);
         }
     }
 
@@ -286,7 +293,7 @@ public class Level3 extends GameStateManager {
                     bullets.remove(i);
                     //Mantiene ordenados a los aliens
                     if (!EnemyList.getType().equals("ClaseE"))
-                        keepSorted(EnemyList);
+                        sortAlienRows(EnemyList);
                 }
             }
         }
@@ -361,7 +368,7 @@ public class Level3 extends GameStateManager {
 
                 if((leftSide == 1 && rightSide == 3) || (rightSide == 1 && leftSide == 3) ||
                         (leftSide == 0 && rightSide == 2) || (rightSide == 0 && leftSide == 2)){
-                    inMiddle(EnemyList);
+                    CenterEnemys(EnemyList);
                 }
             }
         }));
@@ -372,7 +379,7 @@ public class Level3 extends GameStateManager {
      * Hace que el jefe permanezca en el centro.
      * @param EnemyList Lista de enemigos.
      */
-    private void inMiddle(ListModel<Enemy> EnemyList){
+    private void CenterEnemys(ListModel<Enemy> EnemyList){
         int tmpBoss = 0, change = (EnemyList.length() - (EnemyList.length() + 1) / 2);
 
         //Busca la posicion del jefe
@@ -430,7 +437,7 @@ public class Level3 extends GameStateManager {
      * La hilera de aliens permanece unida, y si es clase D los ordena de mayor a menor segun su vida.
      * @param EnemyList Lsita de enemigos.
      */
-    private void keepSorted(ListModel<Enemy> EnemyList){
+    private void sortAlienRows(ListModel<Enemy> EnemyList){
         double lastX = 0;
 
         if (EnemyList.length() > 0)
@@ -454,7 +461,7 @@ public class Level3 extends GameStateManager {
      * Cambia al jefe de posicion cada 3 segundos.
      * @param EnemyList Lista de enemigos.
      */
-    private void bossTransition(ListModel<Enemy> EnemyList){
+    private void changePositionTimer(ListModel<Enemy> EnemyList){
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(
@@ -570,7 +577,7 @@ public class Level3 extends GameStateManager {
                 MainEnemyList.add(new DoubleLinkedList<>());
                 MainEnemyList.get(i).setType("ClaseB");
                 createAliens(MainEnemyList.get(i));
-                bossTransition(MainEnemyList.get(i));
+                changePositionTimer(MainEnemyList.get(i));
             }
             if (rowType == 1){
                 MainEnemyList.add(new CircularList<>());
